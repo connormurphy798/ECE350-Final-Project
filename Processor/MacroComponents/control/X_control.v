@@ -23,9 +23,9 @@ module X_control(ALUinB, imm32, ALUop, shamt, ctrl_MULT, ctrl_DIV, jb, target_ac
     wire Rtype;
     nor opsrc(Rtype, opcode[0], opcode[1], opcode[2], opcode[3], opcode[4]); // only an R type if all these are 0
 
-    // does the B operand come from an immediate (1) or $rt (0)? all instructions but R-type (00000) + branches (00x10) say 1
-    wire b;
-    assign b = (~opcode[4] & ~opcode[3] &  opcode[1] & ~opcode[0]); 
+    // does the B operand come from an immediate (1) or $rt (0)? all instructions EXCEPT R-type + branches say 1
+    wire b, bne, beq, blt;
+    assign b =  bne | beq | blt;
     assign ALUinB = ~Rtype & ~b;
 
     // sign-extend the immediate to be 32 bits
@@ -60,12 +60,13 @@ module X_control(ALUinB, imm32, ALUop, shamt, ctrl_MULT, ctrl_DIV, jb, target_ac
     assign jr   = (~o4 & ~o3 &  o2 & ~o1 & ~o0); // 00100 jr
 
     // bne?
-    wire bne;
     assign bne  = (~o4 & ~o3 & ~o2 &  o1 & ~o0); // 00010 bne
 
     // blt?
-    wire blt;
     assign blt  = (~o4 & ~o3 &  o2 &  o1 & ~o0); // 00110 blt
+
+    // beq?
+    assign beq  = ( o4 &  o3 & ~o2 & ~o1 &  o0); // 11001 beq
 
     // setx?
     assign setx = ( o4 & ~o3 &  o2 & ~o1 &  o0); // 10101 setx
@@ -80,6 +81,7 @@ module X_control(ALUinB, imm32, ALUop, shamt, ctrl_MULT, ctrl_DIV, jb, target_ac
     tristate32 tri_jr  (target_actual, ALU_B,    jr);
     tristate32 tri_bne (target_actual, PCplusN,  bne);
     tristate32 tri_blt (target_actual, PCplusN,  blt);
+    tristate32 tri_beq (target_actual, PCplusN,  beq);
     tristate32 tri_setx(target_actual, target32, setx);
     tristate32 tri_bex (target_actual, target32, bex);
 
@@ -89,6 +91,7 @@ module X_control(ALUinB, imm32, ALUop, shamt, ctrl_MULT, ctrl_DIV, jb, target_ac
                 jr |
                 bne & ne |
                 blt & ~lt & ne | // lt checks if rs<rd but we need rd<rs ==> (rs!<rd & rs!=rd) ._.
+                beq & ~ne |
                 bex & (rstatus != 32'b0 | bypexcpt);
 
     
