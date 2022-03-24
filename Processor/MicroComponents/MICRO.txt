@@ -1,0 +1,21 @@
+MicroComponents contains smaller components that tend to be used only or mostly as part of other, larger components.
+
+
+
+    SUBCATEGORY             DESCRIPTION                                                                   
+
+    addition................Subcircuits used for implementing a 32-bit CLA.
+
+                            Includes 8-bit CLA and full adder.
+    
+
+
+    sll.....................Fixed-bit left logical shift circuits.
+
+                            Includes subcircuits used for 32-bit << component.
+
+    
+
+    sra.....................Fixed-bit right arithmetic shift circuits.
+
+                            Includes subcircuits used for 32-bit >>> component and a 65-bit >>>2 component.

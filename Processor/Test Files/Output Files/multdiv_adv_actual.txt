@@ -1,0 +1,107 @@
+Cycle   9: Wrote 1 into register 3
+Cycle  10: Wrote 35 into register 4
+Cycle  11: Wrote 3 into register 1
+Cycle  12: Wrote 4294967295 into register 3
+Cycle  13: Wrote 4294967261 into register 4
+Cycle  14: Wrote 21 into register 2
+Cycle  15: Wrote 21 into register 2
+Cycle  16: Wrote 21 into register 2
+Cycle  17: Wrote 21 into register 2
+Cycle  18: Wrote 21 into register 2
+Cycle  19: Wrote 21 into register 2
+Cycle  20: Wrote 21 into register 2
+Cycle  21: Wrote 21 into register 2
+Cycle  22: Wrote 21 into register 2
+Cycle  23: Wrote 21 into register 2
+Cycle  24: Wrote 21 into register 2
+Cycle  25: Wrote 21 into register 2
+Cycle  26: Wrote 21 into register 2
+Cycle  27: Wrote 21 into register 2
+Cycle  28: Wrote 21 into register 2
+Cycle  29: Wrote 21 into register 2
+Cycle  30: Wrote 21 into register 2
+Cycle  31: Wrote 63 into register 6
+Cycle  65: Wrote 21 into register 7
+Cycle  66: Wrote 21 into register 7
+Cycle  67: Wrote 21 into register 7
+Cycle  68: Wrote 21 into register 7
+Cycle  69: Wrote 21 into register 7
+Cycle  70: Wrote 21 into register 7
+Cycle  71: Wrote 21 into register 7
+Cycle  72: Wrote 21 into register 7
+Cycle  73: Wrote 21 into register 7
+Cycle  74: Wrote 21 into register 7
+Cycle  75: Wrote 21 into register 7
+Cycle  76: Wrote 21 into register 7
+Cycle  77: Wrote 21 into register 7
+Cycle  78: Wrote 21 into register 7
+Cycle  79: Wrote 21 into register 7
+Cycle  80: Wrote 21 into register 7
+Cycle  81: Wrote 21 into register 7
+Cycle  82: Wrote 189 into register 8
+Cycle  83: Wrote 189 into register 8
+Cycle  84: Wrote 189 into register 8
+Cycle  85: Wrote 189 into register 8
+Cycle  86: Wrote 189 into register 8
+Cycle  87: Wrote 189 into register 8
+Cycle  88: Wrote 189 into register 8
+Cycle  89: Wrote 189 into register 8
+Cycle  90: Wrote 189 into register 8
+Cycle  91: Wrote 189 into register 8
+Cycle  92: Wrote 189 into register 8
+Cycle  93: Wrote 189 into register 8
+Cycle  94: Wrote 189 into register 8
+Cycle  95: Wrote 189 into register 8
+Cycle  96: Wrote 189 into register 8
+Cycle  97: Wrote 189 into register 8
+Cycle  98: Wrote 189 into register 8
+Cycle  99: Wrote 189 into register 8
+Cycle 100: Wrote 189 into register 8
+Cycle 101: Wrote 189 into register 8
+Cycle 102: Wrote 189 into register 8
+Cycle 103: Wrote 189 into register 8
+Cycle 104: Wrote 189 into register 8
+Cycle 105: Wrote 189 into register 8
+Cycle 106: Wrote 189 into register 8
+Cycle 107: Wrote 189 into register 8
+Cycle 108: Wrote 189 into register 8
+Cycle 109: Wrote 189 into register 8
+Cycle 110: Wrote 189 into register 8
+Cycle 111: Wrote 189 into register 8
+Cycle 112: Wrote 189 into register 8
+Cycle 113: Wrote 189 into register 8
+Cycle 114: Wrote 189 into register 8
+Cycle 115: Wrote 7 into register 9
+============== Testing Mode ==============
+Reg  0:           0
+Reg  1:           3
+Reg  2:          21
+Reg  3:  4294967295
+Reg  4:  4294967261
+Reg  5:           0
+Reg  6:          63
+Reg  7:          21
+Reg  8:         189
+Reg  9:           7
+Reg 10:           0
+Reg 11:           0
+Reg 12:           0
+Reg 13:           0
+Reg 14:           0
+Reg 15:           0
+Reg 16:           0
+Reg 17:           0
+Reg 18:           0
+Reg 19:           0
+Reg 20:           0
+Reg 21:           0
+Reg 22:           0
+Reg 23:           0
+Reg 24:           0
+Reg 25:           0
+Reg 26:           0
+Reg 27:           0
+Reg 28:           0
+Reg 29:           0
+Reg 30:           0
+Reg 31:           0

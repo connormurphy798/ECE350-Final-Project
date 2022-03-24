@@ -1,0 +1,27 @@
+MacroComponents contains large components that will go directly into the processor.v file.
+
+
+
+
+    SUBCATEGORY             DESCRIPTION  
+
+    control.................Processor-level control logic.
+
+                            Include controls modules for each of the 5 pipeline stages, plus bypassing and stalling.
+
+
+    general.................Otherwise uncategorized macrocomponents.
+
+                            Includes the ALU and regfile.
+    
+
+
+    multicycle..............Components whose computation takes >1 cycle and induce stalls.
+
+                            Includes only multdiv for now.
+
+    
+
+    pipline.................Pipeline latches.
+
+                            Includes PC, F/D, D/X, X/M + X/C, and M/W + C/W latches.

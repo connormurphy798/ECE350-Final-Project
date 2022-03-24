@@ -1,0 +1,37 @@
+MesoComponents contains components of a wide range of sizes that are likely to be used on their own to fulfill a distinct purpose.
+Most components are mesocomponents.
+
+
+
+    SUBCATEGORY             DESCRIPTION                                                                   
+
+    instructions............Components for interpreting instructions.
+
+                            Includes the instruction decoder and modules for
+                            checking what instructions write to/read from what.
+    
+
+
+    mathlogic...............Single-cycle arithmetic/logic operations.
+
+                            Includes things like CLA, 32-bit and/or/not,
+                            and 32-bit shifters.
+    
+
+
+    memory..................Memory components.
+
+                            Includes registers and flip flops.
+
+    
+
+    multdiv.................Files related to multdiv macrocomponent.
+
+                            Includes multiplier, divider, and multiplier control.
+
+    
+    
+    signalctrl..............Components used for proper routing of signals.
+
+                            Includes multiplexers, decoders, tristate buffers,
+                            and sign extenders.
