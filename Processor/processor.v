@@ -72,7 +72,7 @@ module processor(
     wire [31:0] imm32_X, target32_X, ALU_input_B_pre;                       // X 32-bit info
     wire [4:0] ALUop_X, shamt_X;                                            // X 5-bit control
     wire ALUinB_X, ctrl_MULT_X, ctrl_DIV_X, 
-            jb_X, jal_X, jal, setx_X, neq_X, lt_X;                          // X 1-bit control
+            jb_X, jal_X, setx_X, neq_X, lt_X;                               // X 1-bit control
     
     wire [1:0] ALUinA_bypass, ALUinB_bypass;                                // bypassing mux select bits
     wire MemData_bypass, MULTDIVinA_bypass, MULTDIVinB_bypass,
@@ -111,7 +111,7 @@ module processor(
 
 
     // control signals -------------------------------------------------------------------------------
-    wire multdiving, jbing;                                                 // are we multiplying/branching/jumping?
+    wire multdiving;                                                        // are we multiplying/dividing?
     wire toALU_stall;                                                       // stall condition                     
 
 
@@ -121,7 +121,7 @@ module processor(
 
 
     // waste wires -----------------------------------------------------------------------------------
-    wire PC_adder_of, ov_X;
+    wire PC_adder_of, ov_X;                                                 // unused overflow wires
 
 
 
@@ -148,11 +148,11 @@ module processor(
 
     // increment and assign PC
     cla_32 PC_adder(PC_plus1, PC_adder_of, PC_out, 32'b1, 1'b0);
-    assign PC_in = jbing ? PC_alt : PC_plus1; 
+    assign PC_in = jb_X ? PC_alt : PC_plus1; 
     assign address_imem = PC_out;
 
     // insert either the current instruction or nop into FD
-    assign INSTR_into_FD = jbing ? 32'b0 : q_imem;
+    assign INSTR_into_FD = jb_X ? 32'b0 : q_imem;
 
     // stall condition
     stall stalling(toALU_stall, INSTR_FD, INSTR_DX);
@@ -181,11 +181,11 @@ module processor(
     
 
 
-    assign INSTR_into_DX_alt = jal ? {5'b0, 5'b11111, 22'b0} : 32'b0; // if jal-ing, put add $31, $0, $0 (but override $rs value) 
-    assign INSTR_into_DX = toALU_stall|jbing ? INSTR_into_DX_alt : INSTR_FD;
+    assign INSTR_into_DX_alt = jal_X ? {5'b0, 5'b11111, 22'b0} : 32'b0; // if jal-ing, put add $31, $0, $0 (but override $rs value) 
+    assign INSTR_into_DX = toALU_stall|jb_X ? INSTR_into_DX_alt : INSTR_FD;
 
     assign readRegA_into_DX_alt = PC_FD; // current PC+1
-    assign readRegA_into_DX = jal ? readRegA_into_DX_alt : data_readRegA; 
+    assign readRegA_into_DX = jal_X ? readRegA_into_DX_alt : data_readRegA; 
     
 
     // --------------------------------------------------------------------------------------------------------------------------
@@ -219,11 +219,7 @@ module processor(
     alu arlog(ALU_input_A, ALU_input_B, ALUop_X, shamt_X, ALU_out_pre, neq_X, lt_X, ov_X);
     assign ALU_out = setx_X ? PC_alt : ALU_out_pre; // PC_alt is the 32-bit target - for setx, doesn't actually correspond to PC
 
-    // jumping/branching
-    assign jbing = jb_X; // if jb_X, then we are jumping or branching
-    assign jal = jal_X;
-
-    assign INSTR_into_XM = jb_X & ~jal ? 32'b0 : INSTR_DX;
+    assign INSTR_into_XM = jb_X & ~jal_X ? 32'b0 : INSTR_DX;
 
 
     // --------------------------------------------------------------------------------------------------------------------------
