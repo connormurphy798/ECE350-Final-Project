@@ -16,6 +16,7 @@ module reads_rd(reads, instr);
                     (~o4 & ~o3 & ~o2 &  o1 & ~o0) | // 00010 bne
                     (~o4 & ~o3 &  o2 & ~o1 & ~o0) | // 00100 jr
                     (~o4 & ~o3 &  o2 &  o1 & ~o0) | // 00110 blt
+                    ( o4 &  o3 & ~o2 & ~o1 &  o0) | // 11001 beq
                     ( o4 & ~o3 &  o2 &  o1 & ~o0);  // 10110 bex
 
 endmodule
