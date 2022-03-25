@@ -74,7 +74,7 @@ func assemble(assemblyFile []string, assemblerISA ISA, outputBase string, output
 
 		fields := strings.Fields(strings.ReplaceAll(instr, ",", ""))
 
-		// fmt.Println(fields)
+		//fmt.Println(fields)
 
 		assembledInstr := assembleInstruction(fields)
 
@@ -112,6 +112,10 @@ func assembleInstruction(instruction []string) string {
 		return assembleJIType(instruction)
 	case "JII":
 		return assembleJIIType(instruction)
+	case "BI":
+		return assembleBIType(instruction)
+	case "BII":
+		return assembleBIIType(instruction)
 	case "nop":
 		return NOP
 	default:
@@ -227,6 +231,46 @@ func assembleJIIType(instruction []string) string {
 	}
 
 	assembledInstr := fmt.Sprintf("%s%05b%022d", opcode, reg, 0)
+
+	return assembledInstr
+}
+
+func assembleBIType(instruction []string) string {
+	opcode := isa.instructions[instruction[0]].opcode
+
+	reg, err := loadRegister(instruction[1])
+	if err != nil {
+		log.Fatalf("Invalid register alias %s for instruction: %s\n", instruction[1], strings.Join(instruction, " "))
+	}
+
+	var button_int int
+	button_int, _ = strconv.Atoi(instruction[2])
+
+	assembledInstr := fmt.Sprintf("%s%05b%05b00000000000000000", opcode, reg, uint(button_int)) //button must be unsigned
+
+	return assembledInstr
+}
+
+func assembleBIIType(instruction []string) string {
+	opcode := isa.instructions[instruction[0]].opcode
+
+	var button_int int
+	button_int, _ = strconv.Atoi(instruction[1])
+
+	var immed int
+	if routineLineNum, ok := routines[instruction[2]]; ok {
+		immed = routineLineNum - lineNum -1
+	} else {
+		var err error
+		immed, err = strconv.Atoi(instruction[2])
+		if err != nil {
+			log.Fatalf("Invalid immediate for instruction: %s\n", instruction)
+		}
+	}
+
+	signed_immed := fmt.Sprintf("%017b", uint(immed))
+
+	assembledInstr := fmt.Sprintf("%s00000%05b%s", opcode, uint(button_int), signed_immed)
 
 	return assembledInstr
 }

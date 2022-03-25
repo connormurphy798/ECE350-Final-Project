@@ -16,4 +16,6 @@ jr,JII,00100
 blt,I,00110
 bex,JI,10110
 setx,JI,10101
+sbp,BI,10111
+bbp,BII,11000
 nop,nop,00000
