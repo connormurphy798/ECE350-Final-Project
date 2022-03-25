@@ -1,9 +1,10 @@
-module W_control(RegWE, RegWDest, WrSrc, instr);
+module W_control(RegWE, RegWDest, WrSrc, BVal, instr, controller);
     input [31:0] instr;
+    input [7:0] controller;
 
     output [4:0] RegWDest;
     output [1:0] WrSrc;
-    output RegWE;
+    output RegWE, BVal;
 
     // instruction decoder
     wire [4:0] opcode, rs, rt, rd, shamt, ALUop;
@@ -21,19 +22,27 @@ module W_control(RegWE, RegWDest, WrSrc, instr);
     assign RegWDest = ( o4 & ~o3 &  o2 & ~o1 &  o0) ? 5'b11110 : rd;
 
 
-    // enable writing to registers when doing an R-type instruction, addi, lw, jal, or setx
+    // enable writing to registers when doing an R-type instruction, addi, lw, jal, sbp, or setx
     
     assign RegWE =  (~o4 & ~o3 & ~o2 & ~o1 & ~o0) | // 00000 R-type
                     (~o4 & ~o3 &  o2 & ~o1 &  o0) | // 00101 addi
                     (~o4 &  o3 & ~o2 & ~o1 & ~o0) | // 01000 lw
                     (~o4 & ~o3 & ~o2 &  o1 &  o0) | // 00011 jal
-                    ( o4 & ~o3 &  o2 & ~o1 &  o0);  // 10101 setx
+                    ( o4 & ~o3 &  o2 &     &  o0);  // 101x1 sbp/setx
                     
 
     // 00 = write from ALU output 
     // 01 = write from multdiv (0011x)
     // 10 = write from memory output (lw 01000)
-    assign WrSrc[0] = (~ALUop[4] & ~ALUop[3] & ALUop[2] & ALUop[1]);
-    assign WrSrc[1] = (~opcode[4] & opcode[3] & ~opcode[2] & ~opcode[1] & ~opcode[0]);
+    // 11 = write from controller (sbp 10111)
+    assign WrSrc[0] =   (~ALUop[4] & ~ALUop[3] & ALUop[2] & ALUop[1]) |
+                        ( o4 & ~o3 &  o2 &  o1 &  o0);
+    assign WrSrc[1] =   (~o4 &  o3 & ~o2 & ~o1 & ~o0) |
+                        ( o4 & ~o3 &  o2 &  o1 &  o0);
+    
+
+    // determine the value to be read from the controller
+    mux8_1 buttons(BVal, {rs[2], rs[1], rs[0]}, controller[0], controller[1], controller[2], controller[3],
+                                                controller[4], controller[5], controller[6], controller[7]);
 
 endmodule

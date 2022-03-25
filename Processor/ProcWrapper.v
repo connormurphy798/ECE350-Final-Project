@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 /**
  *
- * Wrapper module that combines processor, regfile, and memory elements.
+ * Wrapper module that combines processor with its related elements.
  *
  **/
 
@@ -13,6 +13,7 @@ module ProcWrapper (clock, reset);
 	wire[31:0] instAddr, instData, 
 		rData, regA, regB,
 		memAddr, memDataIn, memDataOut;
+	wire [7:0] buttons;
 
 
 	// ADD YOUR MEMORY FILE HERE
@@ -31,7 +32,10 @@ module ProcWrapper (clock, reset);
 									
 		// RAM
 		.wren(mwe), .address_dmem(memAddr), 
-		.data(memDataIn), .q_dmem(memDataOut)); 
+		.data(memDataIn), .q_dmem(memDataOut),
+		
+		// Controller
+		.controller(buttons)); 
 	
 	// Instruction Memory (ROM)
 	ROM #(.MEMFILE({INSTR_FILE, ".mem"}))
@@ -52,5 +56,8 @@ module ProcWrapper (clock, reset);
 		.addr(memAddr[11:0]), 
 		.dataIn(memDataIn), 
 		.dataOut(memDataOut));
+	
+	// for testing purposes, assign the buttons to a constant
+	assign buttons = 8'b00100110; // B, Left, and Down
 
 endmodule

@@ -24,6 +24,7 @@ module ProcWrapper_tb #(parameter FILE = "nop");
 	wire[31:0] instAddr, instData, 
 		rData, regA, regB,
 		memAddr, memDataIn, memDataOut;
+	wire[7:0] buttons;
 
 	// Wires for Test Harness
 	wire[4:0] rs1_test, rs1_in;
@@ -65,7 +66,10 @@ module ProcWrapper_tb #(parameter FILE = "nop");
 									
 		// RAM
 		.wren(mwe), .address_dmem(memAddr), 
-		.data(memDataIn), .q_dmem(memDataOut)); 
+		.data(memDataIn), .q_dmem(memDataOut),
+		
+		// Controller
+		.controller(buttons)); 
 	
 	// Instruction Memory (ROM)
 	ROM #(.MEMFILE({DIR, MEM_DIR, FILE, ".mem"}))
@@ -86,6 +90,9 @@ module ProcWrapper_tb #(parameter FILE = "nop");
 		.addr(memAddr[11:0]), 
 		.dataIn(memDataIn), 
 		.dataOut(memDataOut));
+
+	// for testing purposes, assign the buttons to a constant
+	assign buttons = 8'b00100110; // B, Left, and Down
 
 	// Create the clock
 	always

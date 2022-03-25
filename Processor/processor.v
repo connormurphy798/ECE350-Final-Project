@@ -25,9 +25,10 @@ module processor(
     ctrl_readRegB,                  // O: Register to read from port B of RegFile
     data_writeReg,                  // O: Data to write to for RegFile
     data_readRegA,                  // I: Data from port A of RegFile
-    data_readRegB                   // I: Data from port B of RegFile
+    data_readRegB,                  // I: Data from port B of RegFile
 
-    // TODO: add controller inputs
+    // Controller
+    controller                      // I: Button press data for previous frame
 	 
 	);
 
@@ -48,6 +49,9 @@ module processor(
 	output [4:0] ctrl_writeReg, ctrl_readRegA, ctrl_readRegB;
 	output [31:0] data_writeReg;
 	input [31:0] data_readRegA, data_readRegB;
+
+    // Controller
+    input [7:0] controller;
 
 
 
@@ -100,9 +104,9 @@ module processor(
     // W stage ---------------------------------------------------------------------------------------
     wire [31:0] ALUout_MW, memdata_MW, P_CW, INSTR_CW;                      // MW/CW latch outputs
     wire [31:0] WVal;                                                       // write value going to regfile
-    wire RegWE_W;                                                           // W control
+    wire RegWE_W, BVal;                                                     // W control
     wire [4:0] RegWDest_W;                                                  //      they're all of different lengths ._.
-    wire [1:0] WrSrc_W;                                                     //      so we need 3 lines for 3 wires
+    wire [1:0] WrSrc_W;                                                     //      so we need 3 lines for 4 wires
 
 
     // instructions ----------------------------------------------------------------------------------
@@ -252,15 +256,15 @@ module processor(
     // --------------------------------------------------------------------------------------------------------------------------
     
     // control
-    W_control w_ctrl(RegWE_W, RegWDest_W, WrSrc_W, INSTR_MW);
+    W_control w_ctrl(RegWE_W, RegWDest_W, WrSrc_W, BVal, INSTR_MW, controller);
 
     // writeback value
     // select bits: source
     //      00: ALU output
     //      01: multdiv output
     //      10: memory data
-    //      11: garbage. don't assert 11.
-    mux4 wval(WVal, WrSrc_W, ALUout_MW, P_CW, memdata_MW, 32'b0);
+    //      11: controller data
+    mux4 wval(WVal, WrSrc_W, ALUout_MW, P_CW, memdata_MW, {31'b0, BVal});
     
 
     // --------------------------------------------------------------------------------------------------------------------------
