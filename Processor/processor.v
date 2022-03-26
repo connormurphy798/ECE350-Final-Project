@@ -203,7 +203,7 @@ module processor(
 
     // control
     X_control x_ctrl(ALUinB_X, imm32_X, ALUop_X, shamt_X, ctrl_MULT_X, ctrl_DIV_X, jb_X, PC_alt, jal_X, setx_X, 
-                        INSTR_DX, PC_DX, ALU_input_B_pre, neq_X, lt_X, ALU_input_B_pre, (excpt_XM | excpt_MW | excpt_CW | md_excpt));
+                        INSTR_DX, PC_DX, ALU_input_B_pre, neq_X, lt_X, ALU_input_B_pre, (excpt_XM | excpt_MW | excpt_CW | md_excpt), controller);
 
     // bypassing 
     bypass byp(ALUinA_bypass, ALUinB_bypass, MemData_bypass, MULTDIVinA_bypass, MULTDIVinB_bypass, ALUexcptA, ALUexcptB, exceptval_bypass,

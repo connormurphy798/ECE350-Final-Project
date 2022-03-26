@@ -1,8 +1,9 @@
-module X_control(ALUinB, imm32, ALUop, shamt, ctrl_MULT, ctrl_DIV, jb, target_actual, jal, setx, instr, PC, ALU_B, ne, lt, rstatus, bypexcpt);
+module X_control(ALUinB, imm32, ALUop, shamt, ctrl_MULT, ctrl_DIV, jb, target_actual, jal, setx, instr, PC, ALU_B, ne, lt, rstatus, bypexcpt, controller);
     input [31:0] instr, PC, ALU_B;
     input ne, lt;
     input [31:0] rstatus;
     input bypexcpt;
+    input [7:0] controller;
 
     output [31:0] imm32;
     output [4:0] ALUop, shamt;
@@ -24,8 +25,8 @@ module X_control(ALUinB, imm32, ALUop, shamt, ctrl_MULT, ctrl_DIV, jb, target_ac
     nor opsrc(Rtype, opcode[0], opcode[1], opcode[2], opcode[3], opcode[4]); // only an R type if all these are 0
 
     // does the B operand come from an immediate (1) or $rt (0)? all instructions EXCEPT R-type + branches say 1
-    wire b, bne, beq, blt;
-    assign b =  bne | beq | blt;
+    wire b, bne, beq, blt, bbp;
+    assign b =  bne | beq | blt | bbp;
     assign ALUinB = ~Rtype & ~b;
 
     // sign-extend the immediate to be 32 bits
@@ -41,6 +42,11 @@ module X_control(ALUinB, imm32, ALUop, shamt, ctrl_MULT, ctrl_DIV, jb, target_ac
     assign o2 = opcode[2];
     assign o1 = opcode[1];
     assign o0 = opcode[0];
+
+    // determine the button value
+    wire bval;
+    button_val buttons(bval, instr, controller);
+
 
     // j-type instructions and branches! get all the potential targets
     wire [31:0] target32, PCplusN;
@@ -68,6 +74,9 @@ module X_control(ALUinB, imm32, ALUop, shamt, ctrl_MULT, ctrl_DIV, jb, target_ac
     // beq?
     assign beq  = ( o4 &  o3 & ~o2 & ~o1 &  o0); // 11001 beq
 
+    // bbp?
+    assign bbp  = ( o4 &  o3 & ~o2 & ~o1 & ~o0); // 11000 bbp
+
     // setx?
     assign setx = ( o4 & ~o3 &  o2 & ~o1 &  o0); // 10101 setx
 
@@ -82,17 +91,22 @@ module X_control(ALUinB, imm32, ALUop, shamt, ctrl_MULT, ctrl_DIV, jb, target_ac
     tristate32 tri_bne (target_actual, PCplusN,  bne);
     tristate32 tri_blt (target_actual, PCplusN,  blt);
     tristate32 tri_beq (target_actual, PCplusN,  beq);
+    tristate32 tri_bbp (target_actual, PCplusN,  bbp);
     tristate32 tri_setx(target_actual, target32, setx);
     tristate32 tri_bex (target_actual, target32, bex);
 
     // determine if current instruction is a jump/branch that is taken
-    assign jb = j |
-                jal |
-                jr |
-                bne & ne |
-                blt & ~lt & ne | // lt checks if rs<rd but we need rd<rs ==> (rs!<rd & rs!=rd) ._.
-                beq & ~ne |
-                bex & (rstatus != 32'b0 | bypexcpt);
+    wire jb1, jb2;  // split into 2 for fan-in reasons
+    assign jb1 =    j |
+                    jal |
+                    jr |
+                    bne & ne;
+    assign jb2 =    blt & ~lt & ne | // lt checks if rs<rd but we need rd<rs ==> (rs!<rd & rs!=rd) ._.
+                    beq & ~ne |
+                    bbp & bval |
+                    bex & (rstatus != 32'b0 | bypexcpt);  
+    assign jb =     jb1 | jb2;
+                
 
     
 endmodule
