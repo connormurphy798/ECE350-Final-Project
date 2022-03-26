@@ -35,7 +35,7 @@ module ControllerController_tb();
 		    #10 system_clock = ~system_clock;
 
     reg [31:0] counter = 0;
-	  reg [31:0] CounterLimit = 1;   // for now, say a frame clock cycle is 2 system clock cycles (high for 1, low for 1)
+	  wire [31:0] CounterLimit = 1;   // for now, say a frame clock cycle is 2 system clock cycles (high for 1, low for 1)
     always @(posedge system_clock) begin
         if (counter < CounterLimit)
             counter = counter + 1;
