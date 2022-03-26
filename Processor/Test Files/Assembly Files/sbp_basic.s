@@ -1,4 +1,4 @@
-nop
+nop         # simple test of set button press
 nop
 nop
 nop

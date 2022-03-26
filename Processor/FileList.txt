@@ -16,6 +16,7 @@
 ./MacroComponents/pipeline/PC_latch.v
 ./MacroComponents/pipeline/XC_latch.v
 ./MacroComponents/pipeline/XM_latch.v
+./MesoComponents/instructions/button_val.v
 ./MesoComponents/instructions/instr_decoder.v
 ./MesoComponents/instructions/reads_rd.v
 ./MesoComponents/instructions/reads_rs.v

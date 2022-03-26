@@ -42,7 +42,6 @@ module W_control(RegWE, RegWDest, WrSrc, BVal, instr, controller);
     
 
     // determine the value to be read from the controller
-    mux8_1 buttons(BVal, {rs[2], rs[1], rs[0]}, controller[0], controller[1], controller[2], controller[3],
-                                                controller[4], controller[5], controller[6], controller[7]);
+    button_val buttons(BVal, instr, controller);
 
 endmodule

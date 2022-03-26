@@ -91,7 +91,8 @@ module processor(
 
     // M stage ---------------------------------------------------------------------------------------
     wire [31:0] ALUout_XM, regoutB_XM;                                      // XM latch outputs
-    wire MemWE_M;                                                           // M control
+    wire MemWE_M, BVal_M, sbp_M;                                            // M control
+    wire [31:0] bypassed_MVal;                                              // value for MX bypass
     wire [31:0] INSTR_into_MW, VALUE_into_MW;                               // MW latch inputs
 
 
@@ -104,7 +105,7 @@ module processor(
     // W stage ---------------------------------------------------------------------------------------
     wire [31:0] ALUout_MW, memdata_MW, P_CW, INSTR_CW;                      // MW/CW latch outputs
     wire [31:0] WVal;                                                       // write value going to regfile
-    wire RegWE_W, BVal;                                                     // W control
+    wire RegWE_W, BVal_W;                                                   // W control
     wire [4:0] RegWDest_W;                                                  //      they're all of different lengths ._.
     wire [1:0] WrSrc_W;                                                     //      so we need 3 lines for 4 wires
 
@@ -209,11 +210,11 @@ module processor(
                 INSTR_DX, INSTR_XM, INSTR_MW, INSTR_XC, excpt_XM);
 
     // ALU inputs
-    mux4 ALUinAmux(ALU_input_A_0,     ALUinA_bypass, regoutA_DX, WVal, ALUout_XM, ALUout_XM);
+    mux4 ALUinAmux(ALU_input_A_0,     ALUinA_bypass, regoutA_DX, WVal, bypassed_MVal, bypassed_MVal);
     tristate32 ALUnA(ALU_input_A, ALU_input_A_0,    ~ALUexcptA);
     tristate32 ALUeA(ALU_input_A, exceptval_bypass,  ALUexcptA);
 
-    mux4 ALUinBmux(ALU_input_B_pre_0, ALUinB_bypass, regoutB_DX, WVal, ALUout_XM, ALUout_XM);
+    mux4 ALUinBmux(ALU_input_B_pre_0, ALUinB_bypass, regoutB_DX, WVal, bypassed_MVal, bypassed_MVal);
     tristate32 ALUnB(ALU_input_B_pre, ALU_input_B_pre_0, ~ALUexcptB);
     tristate32 ALUeB(ALU_input_B_pre, exceptval_bypass,   ALUexcptB);
     
@@ -235,12 +236,15 @@ module processor(
     // --------------------------------------------------------------------------------------------------------------------------
 
     // control
-    M_control m_ctrl(MemWE_M, INSTR_XM);
+    M_control m_ctrl(MemWE_M, BVal_M, sbp_M, INSTR_XM, controller);
 
     // hook up to data memory
     assign address_dmem = ALUout_XM;
     assign data = MemData_bypass ? WVal : regoutB_XM;
     assign wren = MemWE_M;
+
+    // bypassing value
+    assign bypassed_MVal = sbp_M ? {31'b0, BVal_M} : ALUout_XM; 
 
     // insert setx on exception
     assign INSTR_into_MW = EXCEPTION ? {5'b10101, excpt_val[26:0]} : INSTR_XM;
@@ -256,7 +260,7 @@ module processor(
     // --------------------------------------------------------------------------------------------------------------------------
     
     // control
-    W_control w_ctrl(RegWE_W, RegWDest_W, WrSrc_W, BVal, INSTR_MW, controller);
+    W_control w_ctrl(RegWE_W, RegWDest_W, WrSrc_W, BVal_W, INSTR_MW, controller);
 
     // writeback value
     // select bits: source
@@ -264,7 +268,7 @@ module processor(
     //      01: multdiv output
     //      10: memory data
     //      11: controller data
-    mux4 wval(WVal, WrSrc_W, ALUout_MW, P_CW, memdata_MW, {31'b0, BVal});
+    mux4 wval(WVal, WrSrc_W, ALUout_MW, P_CW, memdata_MW, {31'b0, BVal_W});
     
 
     // --------------------------------------------------------------------------------------------------------------------------
