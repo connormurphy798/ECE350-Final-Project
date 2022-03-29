@@ -1,18 +1,21 @@
-module bypass(ALUinA, ALUinB, MemData, MULTDIVinA, MULTDIVinB, ALUexcptA, ALUexcptB, exceptval, instrDX, instrXM, instrMW, instrXC, excptXM);
+module bypass(ALUinA, ALUinB, ValC, MemData, MULTDIVinA, MULTDIVinB, ALUexcptA, ALUexcptB, ValexcptC, exceptval, instrDX, instrXM, instrMW, instrXC, excptXM);
     input [31:0] instrDX, instrXM, instrMW, instrXC;
     input excptXM;
 
-    output [1:0] ALUinA, ALUinB;
+    output [1:0] ALUinA, ALUinB, ValC;
     output MemData, MULTDIVinA, MULTDIVinB;
-    output ALUexcptA, ALUexcptB;
+    output ALUexcptA, ALUexcptB, ValexcptC;
     output [31:0] exceptval;
 
     // specialized instructions like setx/bex don't have an explicit $rd, just set to $30
     wire XM_issetx, MW_issetx, XM_isbex, MW_isbex;
     assign XM_issetx =  instrXM[31] & ~instrXM[30] &  instrXM[29] & ~instrXM[28] &  instrXM[27]; // 10101 setx
     assign MW_issetx =  instrMW[31] & ~instrMW[30] &  instrMW[29] & ~instrMW[28] &  instrMW[27];
-    //assign XM_isbex  =  instrXM[31] & ~instrXM[30] &  instrXM[29] &  instrXM[28] & ~instrXM[27]; // 10110 bex
-    //assign MW_isbex  =  instrMW[31] & ~instrMW[30] &  instrMW[29] &  instrMW[28] & ~instrMW[27];
+    
+    // ren (11010) reads from all 3! complicates the bypass logic - ren.reads_rd is true, but rd won't be in regB
+    wire DX_isren;
+    assign DX_isren =   instrDX[31] &  instrDX[30] & ~instrDX[29] &  instrDX[28] & ~instrDX[27]; // 11010 ren
+
 
     // get the register codes from the instructions
     wire [4:0] DX_rs, DX_rt, DX_rd, XM_rd, MW_rd, XC_rs, XC_rt;
@@ -48,8 +51,14 @@ module bypass(ALUinA, ALUinB, MemData, MULTDIVinA, MULTDIVinB, ALUexcptA, ALUexc
                         (excptXM) |
                         XM_issetx;
 
-    // B: ((instrDX.rt == 30 & instrDX.reads_rt) | (instrDX.rd == 30 & instrDX.reads_rd)) & (instrXM.has_exception)
-    assign ALUexcptB =  ((DX_rt == r30 & DX_reads_rt) | (DX_rd == r30 & DX_reads_rd)) &
+    // B: ((instrDX.rt == 30 & instrDX.reads_rt) | (instrDX.rd == 30 & instrDX.reads_rd & !ren)) & (instrXM.has_exception)
+    assign ALUexcptB =  ((DX_rt == r30 & DX_reads_rt) | (DX_rd == r30 & DX_reads_rd & ~DX_isren)) &
+                        (excptXM) |
+                        XM_issetx;
+    
+    // C: (instrDX.rd == 30) & (instrDX.reads_rd) & (instrXM.has_exception)
+    assign ValexcptC =  (DX_rd == r30) &
+                        (DX_reads_rd) &
                         (excptXM) |
                         XM_issetx;
 
@@ -73,13 +82,29 @@ module bypass(ALUinA, ALUinB, MemData, MULTDIVinA, MULTDIVinB, ALUexcptA, ALUexc
     // ALUinB code (MX bypass takes precedence)
     //      00 - no bypass
     //      01 - WX bypass
-    //          ((instrDX.rt == instrMW.rd) & (instrDX.reads_rt) | (instrDX.rd == instrMW.rd) & (instrDX.reads_rd)) & (instrMW.writes_rd) & (instrMW.rd != 0)
+    //          ((instrDX.rt == instrMW.rd) & (instrDX.reads_rt) | (instrDX.rd == instrMW.rd) & (instrDX.reads_rd) & (!ren)) & (instrMW.writes_rd) & (instrMW.rd != 0)
     //      1x - MX bypass:
-    //          ((instrDX.rt == instrXM.rd) & (instrDX.reads_rt) | (instrDX.rd == instrXM.rd) & (instrDX.reads_rd)) & (instrXM.writes_rd) & (instrXM.rd != 0)
-    assign ALUinB[0] =  ((DX_rt == MW_rd & DX_reads_rt) | (DX_rd == MW_rd & DX_reads_rd)) &
+    //          ((instrDX.rt == instrXM.rd) & (instrDX.reads_rt) | (instrDX.rd == instrXM.rd) & (instrDX.reads_rd) & (!ren)) & (instrXM.writes_rd) & (instrXM.rd != 0)
+    assign ALUinB[0] =  ((DX_rt == MW_rd & DX_reads_rt) | (DX_rd == MW_rd & DX_reads_rd & ~DX_isren)) &
                         (MW_writes_rd) &
                         (MW_rd_nonzero);
-    assign ALUinB[1] =  ((DX_rt == XM_rd & DX_reads_rt) | (DX_rd == XM_rd & DX_reads_rd)) &
+    assign ALUinB[1] =  ((DX_rt == XM_rd & DX_reads_rt) | (DX_rd == XM_rd & DX_reads_rd & ~DX_isren)) &
+                        (XM_writes_rd) &
+                        (XM_rd_nonzero);
+    
+
+    // ValC code (MX bypass takes precedence)
+    //      00 - no bypass
+    //      01 - WX bypass
+    //          (instrDX.rd == instrMW.rd) & (instrDX.reads_rd) & (instrMW.writes_rd) & (instrMW.rd != 0)
+    //      1x - MX bypass:
+    //          (instrDX.rd == instrXM.rd) & (instrDX.reads_rd) & (instrXM.writes_rd) & (instrXM.rd != 0)
+    assign ValC[0] =    (DX_rd == MW_rd) &
+                        (DX_reads_rd) &
+                        (MW_writes_rd) &
+                        (MW_rd_nonzero);
+    assign ValC[1] =    (DX_rd == XM_rd) &
+                        (DX_reads_rd) &
                         (XM_writes_rd) &
                         (XM_rd_nonzero);
 

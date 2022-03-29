@@ -12,12 +12,14 @@ module reads_rs(reads, instr);
     assign o4 = opcode[4];
 
     // reads is 1 if instr reads $rs, 0 otherwise.
-    assign reads =  (~o4 & ~o3 & ~o2 & ~o1 & ~o0) | // 00000 R-type
-                    (~o4 & ~o3 &  o2 & ~o1 &  o0) | // 00101 addi
-                    (~o4 & ~o3 &  o2 &  o1 &  o0) | // 00111 sw
-                    (~o4 &  o3 & ~o2 & ~o1 & ~o0) | // 01000 lw
-                    (~o4 & ~o3 & ~o2 &  o1 & ~o0) | // 00010 bne
-                    (~o4 & ~o3 &  o2 &  o1 & ~o0) | // 00110 blt
-                    ( o4 &  o3 & ~o2 & ~o1 &  o0);  // 11001 beq
+    wire r1, r2;
+    assign r1 = (~o4       & ~o2 & ~o1 & ~o0) | // 0x000 R-type/lw
+                (~o4 & ~o3 &  o2       &  o0);  // 001x1 addi/sw
+    assign r2 = (~o4 & ~o3       &  o1 & ~o0) | // 00x10 bne/blt
+                ( o4 &  o3 & ~o2 & ~o1 &  o0) | // 11001 beq
+                ( o4 &  o3 & ~o2 &  o1 & ~o0);  // 11010 ren
+
+    assign reads = r1 | r2;
+                    
                     
 endmodule

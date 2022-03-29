@@ -1,5 +1,5 @@
-module D_control(readregA, readregB, instr);
-    output [4:0] readregA, readregB;
+module D_control(readregA, readregB, readregC, instr);
+    output [4:0] readregA, readregB, readregC;
     input [31:0] instr;
 
     // instruction decoder
@@ -15,9 +15,15 @@ module D_control(readregA, readregB, instr);
     // assign readregA to $rs always
     assign readregA = rs;
 
-    // if it's R-type (00000), read from $rt. else (1), read from rd
+    // if it's R-type (00000) or ren (11010), read from $rt. else (1), read from rd
+    wire rtype, ren;
+    assign rtype = ~( opcode[4] |  opcode[3] |  opcode[2] |  opcode[1] |  opcode[0]);
+    assign ren   =  ( opcode[4] &  opcode[3] & ~opcode[2] &  opcode[1] & ~opcode[0]);
     wire src2;
     or notRtype(src2, opcode[0], opcode[1], opcode[2], opcode[3], opcode[4]);
-    assign readregB = src2 ? rd : rt;
+    assign readregB = (rtype | ren) ? rt : rd;
+
+    // also, just always read from $rd. (readregC is only well-defined for ren)
+    assign readregC = rd;
 
 endmodule

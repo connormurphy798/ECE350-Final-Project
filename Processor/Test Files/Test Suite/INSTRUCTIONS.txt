@@ -1,0 +1,35 @@
+Test suite for the processor. Here are some instructions.
+
+
+    ---------------- USING THE TEST SUITE ----------------
+
+Syntax is as follows. From the ECE350-Final-Project directory, run the following:
+
+    . ./Processor/Test\ Files/Test\ Suite/runtests.txt
+
+This will produce a vvp file corresponding to each test case. It's running a lot of tests, so it might take a minute. 
+
+
+To check the output of each test case, run the following from the same directory:
+
+    . ./Processor/Test\ Files/Test\ Suite/checktests.txt
+
+
+
+
+    ---------------- EDITING THE TEST SUITE ----------------
+
+To insert a new test, first make sure you've:
+    - written your test_name.s file
+    - assembled it, placing the test_name.mem file in /Memory Files
+    - put a corresponding test_name_exp.txt file in /Verification Files
+
+Now, add the following line to runtests.txt, where XX is 1 + the number of the last test case currently in the file:
+
+    iverilog -o ./Processor/Test\ Files/Test\ Suite/VVP\ Files/procXX -c Modules.txt -s ProcWrapper_tb -P ProcWrapper_tb.FILE=\"test_name\"
+
+And now to checktests.txt add the following line, again with the same XX:
+
+    vvp ./Processor/Test\ Files/Test\ Suite/VVP\ Files/procXX -v
+
+That's it! The new test case is now part of the test suite.

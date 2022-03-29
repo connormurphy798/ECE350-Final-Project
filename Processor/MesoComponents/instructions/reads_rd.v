@@ -12,11 +12,15 @@ module reads_rd(reads, instr);
     assign o4 = opcode[4];
 
     // reads is 1 if instr reads $rd, 0 otherwise.
-    assign reads  = (~o4 & ~o3 &  o2 &  o1 &  o0) | // 00111 sw
-                    (~o4 & ~o3 & ~o2 &  o1 & ~o0) | // 00010 bne
-                    (~o4 & ~o3 &  o2 & ~o1 & ~o0) | // 00100 jr
-                    (~o4 & ~o3 &  o2 &  o1 & ~o0) | // 00110 blt
-                    ( o4 &  o3 & ~o2 & ~o1 &  o0) | // 11001 beq
-                    ( o4 & ~o3 &  o2 &  o1 & ~o0);  // 10110 bex
+    wire r1, r2;
+    assign r1 = (~o4 & ~o3 &  o2 &  o1      ) | // 0011x sw/blt
+                (~o4 & ~o3 & ~o2 &  o1 & ~o0) | // 00010 bne
+                (~o4 & ~o3 &  o2 & ~o1 & ~o0);  // 00100 jr
+    assign r2 = ( o4 &  o3 & ~o2 & ~o1 &  o0) | // 11001 beq
+                ( o4 & ~o3 &  o2 &  o1 & ~o0) | // 10110 bex
+                ( o4 &  o3 & ~o2 &  o1 & ~o0);  // 11010 ren
+
+    assign reads  = r1 | r2;
+
 
 endmodule

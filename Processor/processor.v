@@ -30,7 +30,14 @@ module processor(
     data_readRegC,                  // I: Data from port C of RegFile
 
     // Controller
-    controller                      // I: Button press data for previous frame
+    controller,                     // I: Button press data for previous frame
+
+    // Graphics
+    address_gmem,                   // O: The address of the data for GraphicsController to get from gmem (graphics memory)
+    x_coord,                        // O: The x [0,160) coordinate at which to display the image
+    y_coord,                        // O: The y [0,120) coordinate at which to display the image
+    sprite,                         // O: Sprite code [0,2] for the image to be displayed
+    gmem_en                         // O: Flag that is asserted when graphics output is valid
 	 
 	);
 
@@ -49,12 +56,18 @@ module processor(
 	// Regfile
 	output ctrl_writeEnable;
 	output [4:0] ctrl_writeReg, ctrl_readRegA, ctrl_readRegB, ctrl_readRegC;
-    assign ctrl_readRegC = 5'b0; // for now! until ren is implemented
 	output [31:0] data_writeReg;
 	input [31:0] data_readRegA, data_readRegB, data_readRegC;
 
     // Controller
     input [7:0] controller;
+
+    // Graphics
+    output [31:0] address_gmem;
+    output [31:0] x_coord;
+    output [31:0] y_coord;
+    output [11:0] sprite;
+    output gmem_en;
 
 
 
@@ -70,24 +83,26 @@ module processor(
 
     // D stage ---------------------------------------------------------------------------------------
     wire [31:0] PC_FD, INSTR_FD;                                            // FD latch outputs
-    wire [4:0] rrA_D, rrB_D;                                                // registers to read
+    wire [4:0] rrA_D, rrB_D, rrC_D;                                         // registers to read
     wire [31:0] readRegA_into_DX, readRegA_into_DX_alt;                     // DX latch inputs
     
 
     // X stage ---------------------------------------------------------------------------------------
-    wire [31:0] PC_DX, regoutA_DX, regoutB_DX, INSTR_DX;                    // DX latch outputs
+    wire [31:0] PC_DX, regoutA_DX, regoutB_DX, regoutC_DX, INSTR_DX;        // DX latch outputs
     wire [31:0] imm32_X, target32_X, ALU_input_B_pre;                       // X 32-bit info
     wire [4:0] ALUop_X, shamt_X;                                            // X 5-bit control
     wire ALUinB_X, ctrl_MULT_X, ctrl_DIV_X, 
-            jb_X, jal_X, setx_X, neq_X, lt_X;                               // X 1-bit control
+            jb_X, jal_X, setx_X, ren_X, neq_X, lt_X;                        // X 1-bit control
+    wire [11:0] sprite_X;                                                   // X other control
     
-    wire [1:0] ALUinA_bypass, ALUinB_bypass;                                // bypassing mux select bits
+    wire [1:0] ALUinA_bypass, ALUinB_bypass, ValC_bypass;                   // bypassing mux select bits
     wire MemData_bypass, MULTDIVinA_bypass, MULTDIVinB_bypass,
-            ALUexcptA, ALUexcptB;                                           // bypassing info
+            ALUexcptA, ALUexcptB, ValexcptC;                                // bypassing info
     wire [31:0] exceptval_bypass;
 
     wire [31:0] ALU_input_A, ALU_input_A_0, ALU_input_B, ALU_input_B_pre_0; // ALU inputs
     wire [31:0] ALU_out_pre, ALU_out;                                       // ALU outputs
+    wire [31:0] Val_C, Val_C_0;                                             // regC data
 
     wire [31:0] INSTR_into_XM;                                              // XM latch inputs
 
@@ -176,7 +191,7 @@ module processor(
     // --------------------------------------------------------------------------------------------------------------------------
 
     // control
-    D_control d_ctrl(rrA_D, rrB_D, INSTR_FD);
+    D_control d_ctrl(rrA_D, rrB_D, rrC_D, INSTR_FD);
 
 
     // assign the regfile wires
@@ -186,6 +201,7 @@ module processor(
     assign ctrl_writeReg    = RegWDest_W;   // /
     assign ctrl_readRegA    = rrA_D;
     assign ctrl_readRegB    = rrB_D;
+    assign ctrl_readRegC    = rrC_D;
     
 
 
@@ -198,18 +214,18 @@ module processor(
 
     // --------------------------------------------------------------------------------------------------------------------------
     // |                                                                                                                        |
-                DX_latch DX(PC_DX, regoutA_DX, regoutB_DX, INSTR_DX,
-                            PC_FD, readRegA_into_DX, data_readRegB, INSTR_into_DX,
+                DX_latch DX(PC_DX, regoutA_DX, regoutB_DX, regoutC_DX, INSTR_DX,
+                            PC_FD, readRegA_into_DX, data_readRegB, data_readRegC, INSTR_into_DX,
                             ~clock, (~multdiving & ~EXCEPTION), reset);                                    
     // |                                                                                                                        |
     // --------------------------------------------------------------------------------------------------------------------------
 
     // control
-    X_control x_ctrl(ALUinB_X, imm32_X, ALUop_X, shamt_X, ctrl_MULT_X, ctrl_DIV_X, jb_X, PC_alt, jal_X, setx_X, 
+    X_control x_ctrl(ALUinB_X, imm32_X, ALUop_X, shamt_X, ctrl_MULT_X, ctrl_DIV_X, jb_X, PC_alt, jal_X, setx_X, ren_X, sprite_X,
                         INSTR_DX, PC_DX, ALU_input_B_pre, neq_X, lt_X, ALU_input_B_pre, (excpt_XM | excpt_MW | excpt_CW | md_excpt), controller);
 
     // bypassing 
-    bypass byp(ALUinA_bypass, ALUinB_bypass, MemData_bypass, MULTDIVinA_bypass, MULTDIVinB_bypass, ALUexcptA, ALUexcptB, exceptval_bypass,
+    bypass byp(ALUinA_bypass, ALUinB_bypass, ValC_bypass, MemData_bypass, MULTDIVinA_bypass, MULTDIVinB_bypass, ALUexcptA, ALUexcptB, ValexcptC, exceptval_bypass,
                 INSTR_DX, INSTR_XM, INSTR_MW, INSTR_XC, excpt_XM);
 
     // ALU inputs
@@ -223,10 +239,24 @@ module processor(
     
     assign ALU_input_B = ALUinB_X ? imm32_X : ALU_input_B_pre;
 
+
     // do the ALU
     alu arlog(ALU_input_A, ALU_input_B, ALUop_X, shamt_X, ALU_out_pre, neq_X, lt_X, ov_X);
     assign ALU_out = setx_X ? PC_alt : ALU_out_pre; // PC_alt is the 32-bit target - for setx, doesn't actually correspond to PC
 
+    // bypass for register C - only relevant to ren
+    mux4 ValCmux(Val_C_0, ValC_bypass, regoutC_DX, WVal, bypassed_MVal, bypassed_MVal);
+    tristate32 ALUnC(Val_C, Val_C_0, ~ValexcptC);
+    tristate32 ALUeC(Val_C, exceptval_bypass,   ValexcptC);
+
+    // send info off to graphics
+    assign gmem_en      = ren_X;
+    assign sprite       = sprite_X;
+    assign x_coord      = ALU_input_A;
+    assign y_coord      = ALU_input_B_pre;
+    assign address_gmem = Val_C;
+
+    // pass instruction to next stage
     assign INSTR_into_XM = jb_X & ~jal_X ? 32'b0 : INSTR_DX;
 
 

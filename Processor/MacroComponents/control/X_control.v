@@ -1,4 +1,4 @@
-module X_control(ALUinB, imm32, ALUop, shamt, ctrl_MULT, ctrl_DIV, jb, target_actual, jal, setx, instr, PC, ALU_B, ne, lt, rstatus, bypexcpt, controller);
+module X_control(ALUinB, imm32, ALUop, shamt, ctrl_MULT, ctrl_DIV, jb, target_actual, jal, setx, ren, sprite, instr, PC, ALU_B, ne, lt, rstatus, bypexcpt, controller);
     input [31:0] instr, PC, ALU_B;
     input ne, lt;
     input [31:0] rstatus;
@@ -13,6 +13,8 @@ module X_control(ALUinB, imm32, ALUop, shamt, ctrl_MULT, ctrl_DIV, jb, target_ac
     output [31:0] target_actual;
     output jal;
     output setx;
+    output ren;
+    output [11:0] sprite;
 
     // instruction decoder
     wire [4:0] opcode, rd, rs, rt;
@@ -108,5 +110,8 @@ module X_control(ALUinB, imm32, ALUop, shamt, ctrl_MULT, ctrl_DIV, jb, target_ac
     assign jb =     jb1 | jb2;
                 
 
+    // enable writing to graphics if instruction is ren
+    assign ren = ( o4 &  o3 & ~o2 &  o1 & ~o0); // 11010 ren
+    assign sprite = instr[11:0];
     
 endmodule
