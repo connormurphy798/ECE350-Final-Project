@@ -1,5 +1,3 @@
-nop
-nop
-addi $1, $0, 5
-nop
-ren sp1, 15, 23, $1
+ren bkg, $2, $3, $1
+ren sp1, $2, $3, $1
+ren sp2, $2, $3, $1
