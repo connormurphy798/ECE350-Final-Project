@@ -9,9 +9,9 @@ module ProcWrapper (clock, reset);
 	input clock, reset;
 
 	wire rwe, mwe;
-	wire[4:0] rd, rs1, rs2;
+	wire[4:0] rd, rs1, rs2, rs3;
 	wire[31:0] instAddr, instData, 
-		rData, regA, regB,
+		rData, regA, regB, regC,
 		memAddr, memDataIn, memDataOut;
 	wire [7:0] buttons;
 

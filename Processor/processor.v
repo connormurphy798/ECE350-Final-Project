@@ -23,9 +23,11 @@ module processor(
     ctrl_writeReg,                  // O: Register to write to in RegFile
     ctrl_readRegA,                  // O: Register to read from port A of RegFile
     ctrl_readRegB,                  // O: Register to read from port B of RegFile
+    ctrl_readRegC,                  // O: Register to read from port C of RegFile
     data_writeReg,                  // O: Data to write to for RegFile
     data_readRegA,                  // I: Data from port A of RegFile
     data_readRegB,                  // I: Data from port B of RegFile
+    data_readRegC,                  // I: Data from port C of RegFile
 
     // Controller
     controller                      // I: Button press data for previous frame
@@ -46,9 +48,10 @@ module processor(
 
 	// Regfile
 	output ctrl_writeEnable;
-	output [4:0] ctrl_writeReg, ctrl_readRegA, ctrl_readRegB;
+	output [4:0] ctrl_writeReg, ctrl_readRegA, ctrl_readRegB, ctrl_readRegC;
+    assign ctrl_readRegC = 5'b0; // for now! until ren is implemented
 	output [31:0] data_writeReg;
-	input [31:0] data_readRegA, data_readRegB;
+	input [31:0] data_readRegA, data_readRegB, data_readRegC;
 
     // Controller
     input [7:0] controller;

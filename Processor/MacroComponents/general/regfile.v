@@ -1,24 +1,23 @@
 module regfile (
 	clock,
 	ctrl_writeEnable, ctrl_reset, ctrl_writeReg,
-	ctrl_readRegA, ctrl_readRegB, data_writeReg,
-	data_readRegA, data_readRegB
+	ctrl_readRegA, ctrl_readRegB, ctrl_readRegC, data_writeReg,
+	data_readRegA, data_readRegB, data_readRegC
 );
 
 	input clock, ctrl_writeEnable, ctrl_reset;
-	input [4:0] ctrl_writeReg, ctrl_readRegA, ctrl_readRegB;
+	input [4:0] ctrl_writeReg, ctrl_readRegA, ctrl_readRegB, ctrl_readRegC;
 	input [31:0] data_writeReg;
 
-	output [31:0] data_readRegA, data_readRegB;
-
-	// add your code here
+	output [31:0] data_readRegA, data_readRegB, data_readRegC;
 
 
-	// decode readRegA, readRegB, and writeReg inputs
-	wire [31:0] readR_A, readR_B, writeR;
+	// decode readRegA, readRegB, readRegC, and writeReg inputs
+	wire [31:0] readR_A, readR_B, readR_C, writeR;
 	
 	dec_5to32 decRA(readR_A, ctrl_readRegA);
 	dec_5to32 decRB(readR_B, ctrl_readRegB);
+	dec_5to32 decRC(readR_C, ctrl_readRegC);
 	dec_5to32 decW (writeR,  ctrl_writeReg);
 
 
@@ -149,6 +148,40 @@ module regfile (
 	tristate32 q29triB(data_readRegB, q29, readR_B[29]);
 	tristate32 q30triB(data_readRegB, q30, readR_B[30]);
 	tristate32 q31triB(data_readRegB, q31, readR_B[31]);
+
+	// and finally regC!
+	tristate32 q00triC(data_readRegC, q00, readR_C[0]);
+	tristate32 q01triC(data_readRegC, q01, readR_C[1]);
+	tristate32 q02triC(data_readRegC, q02, readR_C[2]);
+	tristate32 q03triC(data_readRegC, q03, readR_C[3]);
+	tristate32 q04triC(data_readRegC, q04, readR_C[4]);
+	tristate32 q05triC(data_readRegC, q05, readR_C[5]);
+	tristate32 q06triC(data_readRegC, q06, readR_C[6]);
+	tristate32 q07triC(data_readRegC, q07, readR_C[7]);
+	tristate32 q08triC(data_readRegC, q08, readR_C[8]);
+	tristate32 q09triC(data_readRegC, q09, readR_C[9]);
+	tristate32 q10triC(data_readRegC, q10, readR_C[10]);
+	tristate32 q11triC(data_readRegC, q11, readR_C[11]);
+	tristate32 q12triC(data_readRegC, q12, readR_C[12]);
+	tristate32 q13triC(data_readRegC, q13, readR_C[13]);
+	tristate32 q14triC(data_readRegC, q14, readR_C[14]);
+	tristate32 q15triC(data_readRegC, q15, readR_C[15]);
+	tristate32 q16triC(data_readRegC, q16, readR_C[16]);
+	tristate32 q17triC(data_readRegC, q17, readR_C[17]);
+	tristate32 q18triC(data_readRegC, q18, readR_C[18]);
+	tristate32 q19triC(data_readRegC, q19, readR_C[19]);
+	tristate32 q20triC(data_readRegC, q20, readR_C[20]);
+	tristate32 q21triC(data_readRegC, q21, readR_C[21]);
+	tristate32 q22triC(data_readRegC, q22, readR_C[22]);
+	tristate32 q23triC(data_readRegC, q23, readR_C[23]);
+	tristate32 q24triC(data_readRegC, q24, readR_C[24]);
+	tristate32 q25triC(data_readRegC, q25, readR_C[25]);
+	tristate32 q26triC(data_readRegC, q26, readR_C[26]);
+	tristate32 q27triC(data_readRegC, q27, readR_C[27]);
+	tristate32 q28triC(data_readRegC, q28, readR_C[28]);
+	tristate32 q29triC(data_readRegC, q29, readR_C[29]);
+	tristate32 q30triC(data_readRegC, q30, readR_C[30]);
+	tristate32 q31triC(data_readRegC, q31, readR_C[31]);
 
 
 endmodule

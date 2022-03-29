@@ -9,7 +9,7 @@
 module ProcWrapper_tb #(parameter FILE = "nop");
 
 	// FileData
-	localparam DIR = "Test Files/";
+	localparam DIR = "Processor/Test Files/";
 	localparam MEM_DIR = "Memory Files/";
 	localparam OUT_DIR = "Output Files/";
 	localparam VERIF_DIR = "Verification Files/";
@@ -20,9 +20,9 @@ module ProcWrapper_tb #(parameter FILE = "nop");
 
 	// I/O for the processor
 	wire rwe, mwe;
-	wire[4:0] rd, rs1, rs2;
+	wire[4:0] rd, rs1, rs2, rs3;
 	wire[31:0] instAddr, instData, 
-		rData, regA, regB,
+		rData, regA, regB, regC,
 		memAddr, memDataIn, memDataOut;
 	wire[7:0] buttons;
 
@@ -61,8 +61,8 @@ module ProcWrapper_tb #(parameter FILE = "nop");
 									
 		// Regfile
 		.ctrl_writeEnable(rwe),     .ctrl_writeReg(rd),
-		.ctrl_readRegA(rs1),     .ctrl_readRegB(rs2), 
-		.data_writeReg(rData), .data_readRegA(regA), .data_readRegB(regB),
+		.ctrl_readRegA(rs1),     .ctrl_readRegB(rs2),	.ctrl_readRegC(rs3), 
+		.data_writeReg(rData), .data_readRegA(regA), .data_readRegB(regB), .data_readRegC(regC),
 									
 		// RAM
 		.wren(mwe), .address_dmem(memAddr), 
@@ -81,8 +81,8 @@ module ProcWrapper_tb #(parameter FILE = "nop");
 	regfile RegisterFile(.clock(clock), 
 		.ctrl_writeEnable(rwe), .ctrl_reset(reset), 
 		.ctrl_writeReg(rd),
-		.ctrl_readRegA(rs1_in), .ctrl_readRegB(rs2), 
-		.data_writeReg(rData), .data_readRegA(regA), .data_readRegB(regB));
+		.ctrl_readRegA(rs1_in), .ctrl_readRegB(rs2), .ctrl_readRegC(rs3), 
+		.data_writeReg(rData), .data_readRegA(regA), .data_readRegB(regB), .data_readRegC(regC));
 						
 	// Processor Memory (RAM)
 	RAM ProcMem(.clk(clock), 
