@@ -18,5 +18,6 @@ bex,JI,10110
 setx,JI,10101
 sbp,BI,10111
 bbp,BII,11000
-nop,nop,00000
 beq,I,11001
+ren,G,11010
+nop,nop,00000

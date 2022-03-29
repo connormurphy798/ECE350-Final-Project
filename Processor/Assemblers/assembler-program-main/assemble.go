@@ -74,7 +74,7 @@ func assemble(assemblyFile []string, assemblerISA ISA, outputBase string, output
 
 		fields := strings.Fields(strings.ReplaceAll(instr, ",", ""))
 
-		//fmt.Println(fields)
+		fmt.Println(fields)
 
 		assembledInstr := assembleInstruction(fields)
 
@@ -116,6 +116,8 @@ func assembleInstruction(instruction []string) string {
 		return assembleBIType(instruction)
 	case "BII":
 		return assembleBIIType(instruction)
+	case "G":
+		return assembleGType(instruction)
 	case "nop":
 		return NOP
 	default:
@@ -271,6 +273,40 @@ func assembleBIIType(instruction []string) string {
 	signed_immed := fmt.Sprintf("%017b", uint(immed))
 
 	assembledInstr := fmt.Sprintf("%s00000%05b%s", opcode, uint(button_int), signed_immed)
+
+	return assembledInstr
+}
+
+func assembleGType(instruction []string) string {
+	//instruction[0] = opcode
+	//instruction[1] = S
+	//instruction[2] = X
+	//instruction[3] = Y
+	//instruction[4] = $rd
+
+	opcode := isa.instructions[instruction[0]].opcode
+	reg, err := loadRegister(instruction[4])
+	if err != nil {
+		log.Fatalf("Invalid register alias %s for instruction: %s\n", instruction[4], strings.Join(instruction, " "))
+	}
+
+	var S_field string
+	switch instruction[1] {
+	case "bkg":
+		S_field = fmt.Sprintf("%02b", uint(0))
+	case "sp1":
+		S_field = fmt.Sprintf("%02b", uint(1))
+	case "sp2":
+		S_field = fmt.Sprintf("%02b", uint(2))
+	}
+
+	X_int, _ := strconv.Atoi(instruction[2])
+	Y_int, _ := strconv.Atoi(instruction[3])
+
+	X_field := fmt.Sprintf("%08b", uint(X_int))
+	Y_field := fmt.Sprintf("%07b", uint(Y_int))
+
+	assembledInstr := fmt.Sprintf("%s%05b00000%s%s%s", opcode, reg, S_field, X_field, Y_field)
 
 	return assembledInstr
 }
