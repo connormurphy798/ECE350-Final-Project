@@ -280,33 +280,36 @@ func assembleBIIType(instruction []string) string {
 func assembleGType(instruction []string) string {
 	//instruction[0] = opcode
 	//instruction[1] = S
-	//instruction[2] = X
-	//instruction[3] = Y
+	//instruction[2] = $rs = X
+	//instruction[3] = $rt = y
 	//instruction[4] = $rd
 
 	opcode := isa.instructions[instruction[0]].opcode
-	reg, err := loadRegister(instruction[4])
-	if err != nil {
+
+	rs_reg, rs_err := loadRegister(instruction[2])
+	if rs_err != nil {
+		log.Fatalf("Invalid register alias %s for instruction: %s\n", instruction[2], strings.Join(instruction, " "))
+	}
+	rt_reg, rt_err := loadRegister(instruction[3])
+	if rt_err != nil {
+		log.Fatalf("Invalid register alias %s for instruction: %s\n", instruction[3], strings.Join(instruction, " "))
+	}
+	rd_reg, rd_err := loadRegister(instruction[4])
+	if rd_err != nil {
 		log.Fatalf("Invalid register alias %s for instruction: %s\n", instruction[4], strings.Join(instruction, " "))
 	}
 
 	var S_field string
 	switch instruction[1] {
 	case "bkg":
-		S_field = fmt.Sprintf("%02b", uint(0))
+		S_field = fmt.Sprintf("%012b", uint(0))
 	case "sp1":
-		S_field = fmt.Sprintf("%02b", uint(1))
+		S_field = fmt.Sprintf("%012b", uint(1))
 	case "sp2":
-		S_field = fmt.Sprintf("%02b", uint(2))
+		S_field = fmt.Sprintf("%012b", uint(2))
 	}
 
-	X_int, _ := strconv.Atoi(instruction[2])
-	Y_int, _ := strconv.Atoi(instruction[3])
-
-	X_field := fmt.Sprintf("%08b", uint(X_int))
-	Y_field := fmt.Sprintf("%07b", uint(Y_int))
-
-	assembledInstr := fmt.Sprintf("%s%05b00000%s%s%s", opcode, reg, S_field, X_field, Y_field)
+	assembledInstr := fmt.Sprintf("%s%05b%05b%05b%s", opcode, rd_reg, rs_reg, rt_reg, S_field)
 
 	return assembledInstr
 }
