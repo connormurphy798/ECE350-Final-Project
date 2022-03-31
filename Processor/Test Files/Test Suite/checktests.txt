@@ -24,3 +24,7 @@ vvp ./Processor/Test\ Files/Test\ Suite/VVP\ Files/proc22 -v
 vvp ./Processor/Test\ Files/Test\ Suite/VVP\ Files/proc23 -v
 vvp ./Processor/Test\ Files/Test\ Suite/VVP\ Files/proc24 -v
 vvp ./Processor/Test\ Files/Test\ Suite/VVP\ Files/proc25 -v
+vvp ./Processor/Test\ Files/Test\ Suite/VVP\ Files/proc26 -v
+vvp ./Processor/Test\ Files/Test\ Suite/VVP\ Files/proc27 -v
+vvp ./Processor/Test\ Files/Test\ Suite/VVP\ Files/proc28 -v
+vvp ./Processor/Test\ Files/Test\ Suite/VVP\ Files/proc29 -v

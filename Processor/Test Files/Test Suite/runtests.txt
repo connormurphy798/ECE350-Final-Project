@@ -24,3 +24,7 @@ iverilog -o ./Processor/Test\ Files/Test\ Suite/VVP\ Files/proc22 -c Modules.txt
 iverilog -o ./Processor/Test\ Files/Test\ Suite/VVP\ Files/proc23 -c Modules.txt -s ProcWrapper_tb -P ProcWrapper_tb.FILE=\"setx_basic\"
 iverilog -o ./Processor/Test\ Files/Test\ Suite/VVP\ Files/proc24 -c Modules.txt -s ProcWrapper_tb -P ProcWrapper_tb.FILE=\"stall_edge\"
 iverilog -o ./Processor/Test\ Files/Test\ Suite/VVP\ Files/proc25 -c Modules.txt -s ProcWrapper_tb -P ProcWrapper_tb.FILE=\"swlw_basic\"
+iverilog -o ./Processor/Test\ Files/Test\ Suite/VVP\ Files/proc26 -c Modules.txt -s ProcWrapper_tb -P ProcWrapper_tb.FILE=\"ren_basic\"
+iverilog -o ./Processor/Test\ Files/Test\ Suite/VVP\ Files/proc27 -c Modules.txt -s ProcWrapper_tb -P ProcWrapper_tb.FILE=\"ren_int\"
+iverilog -o ./Processor/Test\ Files/Test\ Suite/VVP\ Files/proc28 -c Modules.txt -s ProcWrapper_tb -P ProcWrapper_tb.FILE=\"ren_int2\"
+iverilog -o ./Processor/Test\ Files/Test\ Suite/VVP\ Files/proc29 -c Modules.txt -s ProcWrapper_tb -P ProcWrapper_tb.FILE=\"ren_adv\"
