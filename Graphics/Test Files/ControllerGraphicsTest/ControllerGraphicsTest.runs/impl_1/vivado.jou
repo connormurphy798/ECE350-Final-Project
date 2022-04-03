@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2020.1 (64-bit)
+# SW Build 2902540 on Wed May 27 19:54:49 MDT 2020
+# IP Build 2902112 on Wed May 27 22:43:36 MDT 2020
+# Start of session at: Sat Apr  2 19:44:59 2022
+# Process ID: 14844
+# Current directory: C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Graphics/Test Files/ControllerGraphicsTest/ControllerGraphicsTest.runs/impl_1
+# Command line: vivado.exe -log VGAControllerTest.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source VGAControllerTest.tcl -notrace
+# Log file: C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Graphics/Test Files/ControllerGraphicsTest/ControllerGraphicsTest.runs/impl_1/VGAControllerTest.vdi
+# Journal file: C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Graphics/Test Files/ControllerGraphicsTest/ControllerGraphicsTest.runs/impl_1\vivado.jou
+#-----------------------------------------------------------
+source VGAControllerTest.tcl -notrace
