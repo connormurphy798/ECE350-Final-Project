@@ -12,6 +12,7 @@ def convertPNG(imgfile, w, h):
     # files
     im  = Image.open("Graphics/Images/" + imgfile + ".png")
     mem = open("Graphics/MemFiles/" + imgfile + ".mem", "w") 
+    print("Generating " + imgfile + ".mem...")
     
     # write to mem file
     for j in range(h):
@@ -28,4 +29,4 @@ def convertPNG(imgfile, w, h):
 
 
 if __name__ == "__main__":
-    convertPNG("bkg_controllertest", 160, 120)
+    convertPNG("bkg_homescreentest", 160, 120)
