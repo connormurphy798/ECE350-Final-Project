@@ -1,0 +1,3 @@
+#Ignoring Vivado generated files
+Controller/VivadoFiles/
+Graphics/VivadoFiles/
