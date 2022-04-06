@@ -1,9 +1,8 @@
 /**
  *
- *	VGA-Controller interaction test module.
- *	Displays an interactive image of a Sega Genesis controller on the VGA screen,
- *	with button pushes appearing on the image.
- *	Used to assess whether the controller is properly connected to the system.
+ *	VGA-Homescreen test module.
+ *	Displays an interactive homescreen on the VGA screen,
+ *	with button pushes affecting the position of a "select" box.
  *
  **/
 
