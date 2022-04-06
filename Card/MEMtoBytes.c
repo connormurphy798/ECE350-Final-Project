@@ -67,6 +67,8 @@ int main(int argc, char *argv[]) {
         }
     } while (val != EOF);
 
+    printf("Generated %s\n", outName);
+
 
     fclose(inputFile);
     fclose(outputFile);

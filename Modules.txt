@@ -66,3 +66,4 @@
 ./Processor/ProcWrapper_tb.v
 ./Processor/RAM.v
 ./Processor/ROM.v
+./Card/CardController.v
