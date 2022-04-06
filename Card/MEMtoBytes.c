@@ -1,11 +1,11 @@
-/*
+/**
 Converts .mem files to raw bytes for microSD card
 parameters: filepath to convert
 output: bytes.dat with raw bytes from .mem ascii data
 
 gcc -o <binaryname> MEMtoBytes.c
 ./<binaryname> <filepath to .mem file>
-*/
+**/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
