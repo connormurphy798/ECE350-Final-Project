@@ -1,7 +1,7 @@
 /**
-Converts .mem files to raw bytes for microSD card
+Converts ascii 0s and 1s in .mem files to raw bytes for microSD card
 parameters: filepath to convert
-output: bytes.dat with raw bytes from .mem ascii data
+output: <filename>.dat with raw bytes from <filename>.mem ascii data
 
 gcc -o <binaryname> MEMtoBytes.c
 ./<binaryname> <filepath to .mem file>
@@ -11,6 +11,11 @@ gcc -o <binaryname> MEMtoBytes.c
 #include <string.h>
 
 int main(int argc, char *argv[]) {
+    //check that there are exactly two arguments
+    if (argc != 2) {
+        printf("Formatting error: must be in form ./<executable> <file.mem>\n");
+        exit(1);
+    }
 
     //get input file from command line
     FILE *inputFile;
@@ -18,13 +23,22 @@ int main(int argc, char *argv[]) {
     
     //check for errors in loading file
     if ((inputFile = fopen(fname, "r")) == NULL){
-        printf("Error opening file");
+        printf("File error: %s could not be found\n", fname);
+        exit(1);
+    }
+
+    //check that fname has a .mem extension
+    char *ext = ".mem";
+    if (strstr(fname, ext) == NULL) {
+        printf("File error: file must be of type .mem\n");
+        printf("received file %s\n", fname);
         exit(1);
     }
 
     //create output file
     FILE *outputFile;
-    char outName[50] = "bytes.dat";
+    char outName[50];
+    snprintf(outName, sizeof outName, "%s.dat", strtok(fname, "."));
     outputFile = fopen(outName, "wb");
 
     int val;
