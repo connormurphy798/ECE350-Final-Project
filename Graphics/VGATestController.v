@@ -16,20 +16,8 @@ module VGATestController(
 	output[3:0] VGA_R,  // Red Signal Bits
 	output[3:0] VGA_G,  // Green Signal Bits
 	output[3:0] VGA_B,  // Blue Signal Bits
-	inout ps2_clk,
-	inout ps2_data,
-	input up,
-	input down,
-	input left,
-	input right,
-	input pin0,
-	input pin1,
-	input pin2,
-	input pin3,
-	input pin5,
-	output pin6,
-	input pin8,
-	output[7:0] buttons);
+	input[7:0] buttons	// controller buttons
+	);
 	
 	// Lab Memory Files Location
 	localparam FILES_PATH = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Graphics/MemFiles/";
@@ -87,7 +75,7 @@ module VGATestController(
 		.DEPTH(PIXEL_COUNT), 				     // Set RAM depth to contain every pixel
 		.DATA_WIDTH(PALETTE_ADDRESS_WIDTH),      // Set data width according to the color palette
 		.ADDRESS_WIDTH(PIXEL_ADDRESS_WIDTH),     // Set address with according to the pixel count
-		.MEMFILE({FILES_PATH, "bkg_controllertest.mem"})) 	// Memory initialization
+		.MEMFILE({FILES_PATH, "bkg_controller.mem"})) 	// Memory initialization
 	ImageData(
 		.clk(clk), 						 // Falling edge of the 100 MHz clk
 		.addr(imgAddress),					 // Image data address
@@ -106,11 +94,6 @@ module VGATestController(
 	assign colorOut = active ? colorData : color1; // When not active, output white
 
 
-
-	// buttons!
-	ControllerController ctrlr( buttons,
-								pin0, pin1, pin2, pin3, pin5, pin6, pin8,
-								clk25);
 
 	wire button_color;
 	assign button_color = color0; // let's try black

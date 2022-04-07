@@ -29,4 +29,4 @@ def convertPNG(imgfile, w, h):
 
 
 if __name__ == "__main__":
-    convertPNG("bkg_homescreentest", 160, 120)
+    convertPNG("bkg_NAME", 160, 120)

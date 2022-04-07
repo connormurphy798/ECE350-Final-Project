@@ -1,13 +1,12 @@
 /**
  *
- *	VGA-Homescreen test module.
- *	Displays an interactive homescreen on the VGA screen,
- *	with button pushes affecting the position of a "select" box.
+ *	VGA-Welcome screen module.
+ *  Displays on boot.
  *
  **/
 
 `timescale 1 ns/ 100 ps
-module VGAHomescreen(     
+module VGAWelcome(     
 	input clk, 			// 100 MHz System Clock
 	input reset, 		// Reset Signal
 	output hSync, 		// H Sync Signal
@@ -15,7 +14,7 @@ module VGAHomescreen(
 	output[3:0] VGA_R,  // Red Signal Bits
 	output[3:0] VGA_G,  // Green Signal Bits
 	output[3:0] VGA_B,  // Blue Signal Bits
-	output[7:0] buttons	// controller buttons
+	input [7:0] buttons // controller buttons (unused)
 	);
 	
 	// Lab Memory Files Location
@@ -74,7 +73,7 @@ module VGAHomescreen(
 		.DEPTH(PIXEL_COUNT), 				     // Set RAM depth to contain every pixel
 		.DATA_WIDTH(PALETTE_ADDRESS_WIDTH),      // Set data width according to the color palette
 		.ADDRESS_WIDTH(PIXEL_ADDRESS_WIDTH),     // Set address with according to the pixel count
-		.MEMFILE({FILES_PATH, "bkg_homescreen.mem"})) 	// Memory initialization
+		.MEMFILE({FILES_PATH, "bkg_welcome.mem"})) 	// Memory initialization
 	ImageData(
 		.clk(clk), 						 // Falling edge of the 100 MHz clk
 		.addr(imgAddress),					 // Image data address
@@ -93,49 +92,5 @@ module VGAHomescreen(
 	assign colorOut = active ? colorData : color1; // When not active, output white
 
 
-
-	wire button_color;
-	assign button_color = color0; // let's try black
-
-		// GAME
-	wire [7:0] g_l = 52;	wire [6:0] g_t = 50;	wire [7:0] g_r = 109;	wire [6:0] g_b = 53;
-
-    	// CONTROLLER
-	wire [7:0] c_l = 13;	wire [6:0] c_t = 90;	wire [7:0] c_r = 68;	wire [6:0] c_b = 92;
-
-    	// SETTINGS
-	wire [7:0] s_l = 100;	wire [6:0] s_t = 90;	wire [7:0] s_r = 142;	wire [6:0] s_b = 92;
-
- 
-		// inside a selection?
-	reg inGAME, inCTRL, inSTGS;
-	always @(posedge clk25) begin
-	   	inGAME	<=	x_adj >= g_l &
-					x_adj <  g_r &
-					y_adj >= g_t &
-					y_adj <  g_b;
-		inCTRL 	<=	x_adj >= c_l &
-					x_adj <  c_r &
-					y_adj >= c_t &
-					y_adj <  c_b;
-		inSTGS 	<=	x_adj >= s_l &
-					x_adj <  s_r &
-					y_adj >= s_t &
-					y_adj <  s_b;
-	end
-	
-
-
-	// Quickly assign the output colors to their channels using concatenation
-    wire [1:0] sel;
-    HomescreenFSM fsm(sel, buttons, clk, 1'b1, reset);
-	wire onGAME, onCTRL, onSTGS;
-	assign onGAME   = inGAME & (~sel[1] & ~sel[0]);  // state 00 = GAME
-    assign onCTRL   = inCTRL & (~sel[1] &  sel[0]);  // state 01 = CONTROLLER
-    assign onSTGS   = inSTGS & ( sel[1] & ~sel[0]);  // state 10 = SETTINGS
-
-	
-	wire onSELECTION = onGAME | onCTRL | onSTGS;
-
-	assign {VGA_R, VGA_G, VGA_B} = onSELECTION ? color0 : colorOut;
+	assign {VGA_R, VGA_G, VGA_B} = colorOut;
 endmodule
