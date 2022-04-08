@@ -5,8 +5,9 @@
  **/
 
 
-module UserInterfaceFSM(curr, buttons, clk, en, rst);
+module UserInterfaceFSM(curr, buttons, H, clk, en, rst);
     input [7:0] buttons;    // {Start, C, B, A, Right, Left, Down, Up}
+    input [1:0] H;          // homescreen state
     input clk, en, rst;
 
     wire C3, C2, C1, C0;
@@ -36,10 +37,7 @@ module UserInterfaceFSM(curr, buttons, clk, en, rst);
 	always @(posedge clk) begin
 		pixCounter <= pixCounter + 1; // Since the reg is only 3 bits, it will reset every 8 cycles
 	end
-
-    // homescreen fsm, enabled when at the homescreen state
-    wire [1:0] H;
-    HomescreenFSM hs(H, {R, L, D, U}, clk125, en & HOMESCREEN, rst);    
+  
 
     // state logic:
     //      0000: welcome to guy city   (unreachable except on boot)
@@ -54,13 +52,13 @@ module UserInterfaceFSM(curr, buttons, clk, en, rst);
                 (SETTINGS   & ~B);
     
     assign N1 = (HOMESCREEN &  A & ~H[1] &  H[0]) |
-                (CONTROLLER & ~U & ~B) |
-                (CONTROLLER & ~U &  B) |
-                (CONTROLLER &  U & ~B);
+                (CONTROLLER & ~D & ~B) |
+                (CONTROLLER & ~D &  B) |
+                (CONTROLLER &  D & ~B);
 
     assign N0 = (WELCOME    &  S & ~A) |
                 (HOMESCREEN & ~A) |
-                (CONTROLLER &  U &  B) |
+                (CONTROLLER &  D &  B) |
                 (SETTINGS   &  B);
 
     // d flip flops

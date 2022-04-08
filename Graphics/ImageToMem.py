@@ -4,13 +4,13 @@ File for converting images to .mem files for use in graphics memory.
 
 from PIL import Image
 
-def convertPNG(imgfile, w, h):
+def convertImage(imgfile, w, h, type=""):
     """
     converts imgfile of dimensions (w,h) into a .mem file,
     placing it in the Graphics/MemFiles/ directory
     """
     # files
-    im  = Image.open("Graphics/Images/" + imgfile + ".png")
+    im  = Image.open("Graphics/Images/" + imgfile + type)
     mem = open("Graphics/MemFiles/" + imgfile + ".mem", "w") 
     print("Generating " + imgfile + ".mem...")
     
@@ -19,7 +19,7 @@ def convertPNG(imgfile, w, h):
         currLine = []
         for i in range(w):
             color = im.getpixel((i,j))
-            if color[0] > 127:
+            if color[0] > 127 or color[1] > 127 or color[2] > 127:
                 currLine.append("1")
             else:
                 currLine.append("0")
@@ -29,4 +29,4 @@ def convertPNG(imgfile, w, h):
 
 
 if __name__ == "__main__":
-    convertPNG("bkg_NAME", 160, 120)
+    convertImage("bkg_welcome", 160, 120, ".png")

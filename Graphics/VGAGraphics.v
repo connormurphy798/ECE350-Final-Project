@@ -40,7 +40,8 @@ module VGAGraphics(
         end
     end
 
-    UserInterfaceFSM uifsm(curr, buttons, clk, 1'b1, reset | forcereset);
+    wire [1:0] H;   // homescreen state
+    UserInterfaceFSM uifsm(curr, buttons, H, clk, 1'b1, reset | forcereset);
 
     // encode current state:
     //      000: welcome
@@ -74,7 +75,7 @@ module VGAGraphics(
     VGAHomescreen homescreen(   .clk(clk), .reset(reset),
 	                            .hSync(hSync001), .vSync(vSync001),
                                 .VGA_R(VGA_R001), .VGA_G(VGA_G001), .VGA_B(VGA_B001),
-                                .buttons(buttons)
+                                .buttons(buttons), .fsm_en(~display[2] & ~display[1] & display[0]), .sel(H) 
                                 );
     
     // CONTROLLER
