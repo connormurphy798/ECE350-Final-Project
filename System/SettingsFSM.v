@@ -27,3 +27,4 @@ module SettingsFSM(curr, volume, color, buttons, clk, en, rst);
     dffe_ref Q(curr, next, clk, en, rst);
 
     // FSMs for volume and color
+endmodule

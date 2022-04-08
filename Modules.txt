@@ -1,5 +1,13 @@
+./Card/CardController.v
 ./Controller/ControllerController.v
 ./Controller/ControllerController_tb.v
+./Controller/ControllerController_tb_h.v
+./Graphics/VGAGraphics.v
+./Graphics/VGAGraphics_tb.v
+./Graphics/VGAHomescreen.v
+./Graphics/VGATestController.v
+./Graphics/VGATimingGenerator.v
+./Graphics/VGAWelcome.v
 ./Processor/MacroComponents/control/bypass.v
 ./Processor/MacroComponents/control/C_control.v
 ./Processor/MacroComponents/control/D_control.v
@@ -40,11 +48,14 @@
 ./Processor/MesoComponents/signalctrl/dec_5to32.v
 ./Processor/MesoComponents/signalctrl/mux2.v
 ./Processor/MesoComponents/signalctrl/mux2_1.v
+./Processor/MesoComponents/signalctrl/mux2_4.v
 ./Processor/MesoComponents/signalctrl/mux32.v
 ./Processor/MesoComponents/signalctrl/mux4.v
 ./Processor/MesoComponents/signalctrl/mux4_1.v
+./Processor/MesoComponents/signalctrl/mux4_4.v
 ./Processor/MesoComponents/signalctrl/mux8.v
 ./Processor/MesoComponents/signalctrl/mux8_1.v
+./Processor/MesoComponents/signalctrl/mux8_4.v
 ./Processor/MesoComponents/signalctrl/signext17_32.v
 ./Processor/MesoComponents/signalctrl/tristate01.v
 ./Processor/MesoComponents/signalctrl/tristate32.v
@@ -66,4 +77,7 @@
 ./Processor/ProcWrapper_tb.v
 ./Processor/RAM.v
 ./Processor/ROM.v
-./Card/CardController.v
+./System/HomescreenFSM.v
+./System/SettingsFSM.v
+./System/UserInterfaceFSM.v
+./System/UserInterfaceFSM_tb.v

@@ -4,7 +4,7 @@
  *  Organizes all the different VGA controllers for different portions of the console.
  *
  **/
-
+ 
  `timescale 1 ns/ 100 ps
 module VGAGraphics(     
 	input clk, 			// 100 MHz System Clock
@@ -22,14 +22,25 @@ module VGAGraphics(
 	output pin6,
 	input pin8,
 	output[7:0] buttons,
-    output[4:0] curr
+    output[3:0] curr
     );
 
     // buttons
     ControllerController ctrlr(buttons, pin0, pin1, pin2, pin3, pin5, pin6, pin8, clk);
 
     // get the current screen to be displayed
-    UserInterfaceFSM uifsm(curr, buttons, clk, 1'b1, reset);
+    reg forcereset = 1;
+    reg [31:0] counter = 0;
+    always @(posedge clk) begin
+        if (counter < 200) begin
+            counter = counter + 15;
+        end else begin
+            counter = 300;
+            forcereset = 0;
+        end
+    end
+
+    UserInterfaceFSM uifsm(curr, buttons, clk, 1'b1, reset | forcereset);
 
     // encode current state:
     //      000: welcome
@@ -37,10 +48,14 @@ module VGAGraphics(
     //      010: controller test 
     //      011: settings
     //      100: game
+    wire C3 = curr[3];  wire C2 = curr[2];  wire C1 = curr[1];  wire C0 = curr[0];
     wire [2:0] display;
-    assign display[0] = curr[0]; // just doing welcome, homescreen, and controller for now
-    assign display[1] = curr[1];
-    assign display[2] = 1'b0;
+    assign display[2] = ( C3 & ~C2 & ~C1 & ~C0);
+    assign display[1] = (       C2 & ~C1 & ~C0) |
+                        (             C1 & ~C0);
+    assign display[0] = (       C2 & ~C1 & ~C0) |
+                        (                   C0);
+
 
     // -------------------- all the different possible VGA screens ------------------------
     

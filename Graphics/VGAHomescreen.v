@@ -15,7 +15,7 @@ module VGAHomescreen(
 	output[3:0] VGA_R,  // Red Signal Bits
 	output[3:0] VGA_G,  // Green Signal Bits
 	output[3:0] VGA_B,  // Blue Signal Bits
-	output[7:0] buttons	// controller buttons
+	input[7:0] buttons	// controller buttons
 	);
 	
 	// Lab Memory Files Location
@@ -128,7 +128,7 @@ module VGAHomescreen(
 
 	// Quickly assign the output colors to their channels using concatenation
     wire [1:0] sel;
-    HomescreenFSM fsm(sel, buttons, clk, 1'b1, reset);
+    HomescreenFSM fsm(sel, buttons[3:0], clk, 1'b1, reset);
 	wire onGAME, onCTRL, onSTGS;
 	assign onGAME   = inGAME & (~sel[1] & ~sel[0]);  // state 00 = GAME
     assign onCTRL   = inCTRL & (~sel[1] &  sel[0]);  // state 01 = CONTROLLER
