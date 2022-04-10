@@ -1,13 +1,13 @@
 /**
  *
- *	VGA-Homescreen module.
+ *	VGA-Settings module.
  *	Displays an interactive homescreen on the VGA screen,
  *	with button pushes affecting the position of a "select" box.
  *
  **/
 
 `timescale 1 ns/ 100 ps
-module VGAHomescreen(     
+module VGASettings(     
 	input clk, 			// 100 MHz System Clock
 	input reset, 		// Reset Signal
 	output hSync, 		// H Sync Signal
@@ -17,7 +17,7 @@ module VGAHomescreen(
 	output[3:0] VGA_B,  // Blue Signal Bits
 	input[7:0] buttons, // controller buttons
 	input fsm_en,		// enable homescreen fsm
-	output[1:0] sel		// current state
+	output[1:0] chc		// current state (choice)
 	);
 	
 	// Lab Memory Files Location
@@ -76,7 +76,7 @@ module VGAHomescreen(
 		.DEPTH(PIXEL_COUNT), 				     // Set RAM depth to contain every pixel
 		.DATA_WIDTH(PALETTE_ADDRESS_WIDTH),      // Set data width according to the color palette
 		.ADDRESS_WIDTH(PIXEL_ADDRESS_WIDTH),     // Set address with according to the pixel count
-		.MEMFILE({FILES_PATH, "bkg_homescreen.mem"})) 	// Memory initialization
+		.MEMFILE({FILES_PATH, "bkg_colors.mem"})) 	// Memory initialization
 	ImageData(
 		.clk(clk), 						 // Falling edge of the 100 MHz clk
 		.addr(imgAddress),					 // Image data address
@@ -99,44 +99,90 @@ module VGAHomescreen(
 	wire button_color;
 	assign button_color = color0; // let's try black
 
-		// GAME
-	wire [7:0] g_l = 52;	wire [6:0] g_t = 50;	wire [7:0] g_r = 109;	wire [6:0] g_b = 53;
+			// DEFAULT
+	wire [7:0] D0_l = 4;	wire [6:0] D0_t = 48;	wire [7:0] D0_r = 75;	wire [6:0] D0_b = 50;
+	wire [7:0] D1_l = 72;	wire [6:0] D1_t = 29;	wire [7:0] D1_r = 75;	wire [6:0] D1_b = 32;
 
-    	// CONTROLLER
-	wire [7:0] c_l = 13;	wire [6:0] c_t = 90;	wire [7:0] c_r = 68;	wire [6:0] c_b = 92;
+		// GAMEBOY
+	wire [7:0] G0_l = 85;	wire [6:0] G0_t = 48;	wire [7:0] G0_r = 156;	wire [6:0] G0_b = 50;
+	wire [7:0] G1_l = 153;	wire [6:0] G1_t = 29;	wire [7:0] G1_r = 156;	wire [6:0] G1_b = 32;
 
-    	// SETTINGS
-	wire [7:0] s_l = 100;	wire [6:0] s_t = 90;	wire [7:0] s_r = 142;	wire [6:0] s_b = 92;
+    	// NIGHTMODE
+	wire [7:0] N0_l = 4;	wire [6:0] N0_t = 87;	wire [7:0] N0_r = 75;	wire [6:0] N0_b = 89;	
+	wire [7:0] N1_l = 72;	wire [6:0] N1_t = 68;	wire [7:0] N1_r = 75;	wire [6:0] N1_b = 71;
 
+		// BLUE
+	wire [7:0] B0_l = 85;	wire [6:0] B0_t = 87;	wire [7:0] B0_r = 156;	wire [6:0] B0_b = 89;
+	wire [7:0] B1_l = 153;	wire [6:0] B1_t = 68;	wire [7:0] B1_r = 156;	wire [6:0] B1_b = 71;
  
-		// inside a selection?
-	reg inGAME, inCTRL, inSTGS;
+		// inside a selection? 0 denotes mouseover, 1 denotes choice
+	reg inDFLT0, inDFLT1;
+	reg inGBOY0, inGBOY1;
+	reg inNGHT0, inNGHT1;
+	reg inBLUE0, inBLUE1;
 	always @(posedge clk25) begin
-	   	inGAME	<=	x_adj >= g_l &
-					x_adj <  g_r &
-					y_adj >= g_t &
-					y_adj <  g_b;
-		inCTRL 	<=	x_adj >= c_l &
-					x_adj <  c_r &
-					y_adj >= c_t &
-					y_adj <  c_b;
-		inSTGS 	<=	x_adj >= s_l &
-					x_adj <  s_r &
-					y_adj >= s_t &
-					y_adj <  s_b;
+	   	inDFLT0	<=	x_adj >= D0_l &
+					x_adj <  D0_r &
+					y_adj >= D0_t &
+					y_adj <  D0_b;
+		inDFLT1	<=	x_adj >= D1_l &
+					x_adj <  D1_r &
+					y_adj >= D1_t &
+					y_adj <  D1_b;
+		
+		inGBOY0	<=	x_adj >= G0_l &
+					x_adj <  G0_r &
+					y_adj >= G0_t &
+					y_adj <  G0_b;
+		inGBOY1	<=	x_adj >= G1_l &
+					x_adj <  G1_r &
+					y_adj >= G1_t &
+					y_adj <  G1_b;
+
+		inNGHT0	<=	x_adj >= N0_l &
+					x_adj <  N0_r &
+					y_adj >= N0_t &
+					y_adj <  N0_b;
+		inNGHT1	<=	x_adj >= N1_l &
+					x_adj <  N1_r &
+					y_adj >= N1_t &
+					y_adj <  N1_b;
+		
+		inBLUE0	<=	x_adj >= B0_l &
+					x_adj <  B0_r &
+					y_adj >= B0_t &
+					y_adj <  B0_b;
+		inBLUE1	<=	x_adj >= B1_l &
+					x_adj <  B1_r &
+					y_adj >= B1_t &
+					y_adj <  B1_b;
 	end
 	
 
 
 	// Quickly assign the output colors to their channels using concatenation
-    HomescreenFSM fsm(sel, buttons[3:0], clk, fsm_en, reset);
-	wire onGAME, onCTRL, onSTGS;
-	assign onGAME   = inGAME & (~sel[1] & ~sel[0]);  // state 00 = GAME
-    assign onCTRL   = inCTRL & (~sel[1] &  sel[0]);  // state 01 = CONTROLLER
-    assign onSTGS   = inSTGS & ( sel[1] & ~sel[0]);  // state 10 = SETTINGS
+	wire [1:0] sel;
+    ColorsFSM fsm(sel, chc, buttons, clk, fsm_en, reset);
+	
+	wire onDFLT0, onDFLT1;
+	assign onDFLT0	= inDFLT0 & (~sel[1] & ~sel[0]);  // state 00 = DEFAULT
+	assign onDFLT1	= inDFLT1 & (~chc[1] & ~chc[0]);
+
+	wire onGBOY0, onGBOY1;
+	assign onGBOY0	= inGBOY0 & (~sel[1] &  sel[0]);  // state 01 = GAMEBOY
+	assign onGBOY1	= inGBOY1 & (~chc[1] &  chc[0]);
+
+	wire onNGHT0, onNGHT1;
+	assign onNGHT0	= inNGHT0 & ( sel[1] &  ~sel[0]);  // state 10 = NIGHTMODE
+	assign onNGHT1	= inNGHT1 & ( chc[1] &  ~chc[0]);
+
+	wire onBLUE0, onBLUE1;
+	assign onBLUE0	= inBLUE0 & ( sel[1] &  sel[0]);  // state 11 = BLUE
+	assign onBLUE1	= inBLUE1 & ( chc[1] &  chc[0]);
 
 	
-	wire onSELECTION = onGAME | onCTRL | onSTGS;
+	wire onSELECTION 	= onDFLT0 | onGBOY0 | onNGHT0 | onBLUE0;
+	wire onCHOICE 		= onDFLT1 | onGBOY1 | onNGHT1 | onBLUE1;
 
-	assign {VGA_R, VGA_G, VGA_B} = onSELECTION ? color0 : colorOut;
+	assign {VGA_R, VGA_G, VGA_B} = onSELECTION | onCHOICE ? color0 : colorOut;
 endmodule

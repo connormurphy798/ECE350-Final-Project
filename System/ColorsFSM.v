@@ -1,6 +1,7 @@
 /**
  *
- *  Hardware finite state machine representing the state of the settings menu.
+ *  Hardware finite state machine representing the state of the color palette
+ *  component in the settings menu.
  *
  **/
 
@@ -13,10 +14,11 @@ module ColorsFSM(color_sel, color_chc, buttons, clk, en, rst);
     output [1:0] color_chc;     // color chosen (0 to 3)
 
     // state logic:
-    //      00: game
-    //      01: controller test
-    //      10: settings
-    wire [1:0] next_sel;           // next state for select
+    //      00: default
+    //      01: gameboy
+    //      10: nightmode
+    //      11: blue
+    wire [1:0] next_sel;           // next state
     wire S1 = color_sel[1];
     wire S0 = color_sel[0];
     wire U = buttons[0];    wire D = buttons[1];    wire L = buttons[2];    wire R = buttons[3];    wire A = buttons[4];

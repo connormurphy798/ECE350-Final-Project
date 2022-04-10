@@ -41,6 +41,7 @@ module VGAGraphics(
     end
 
     wire [1:0] H;   // homescreen state
+    wire [1:0] P;   // color palette selection
     UserInterfaceFSM uifsm(curr, buttons, H, clk, 1'b1, reset | forcereset);
 
     // encode current state:
@@ -86,24 +87,33 @@ module VGAGraphics(
                                     .VGA_R(VGA_R010), .VGA_G(VGA_G010), .VGA_B(VGA_B010),
                                     .buttons(buttons)
                                     );
+    
+    // SETTINGS
+    wire hSync011, vSync011;
+    wire [3:0] VGA_R011, VGA_G011, VGA_B011;
+    VGASettings settings(   .clk(clk), .reset(reset),
+	                        .hSync(hSync011), .vSync(vSync011),
+                            .VGA_R(VGA_R011), .VGA_G(VGA_G011), .VGA_B(VGA_B011),
+                            .buttons(buttons), .fsm_en(~display[2] &  display[1] & display[0]), .chc(P) 
+                            );
 
     
     // select which ones are to be read
     mux8_1 hsync(   hSync, display,
-                    hSync000, hSync001, hSync010, hSync001,
+                    hSync000, hSync001, hSync010, hSync011,
                     hSync001, hSync001, hSync001, hSync001);
     mux8_1 vsync(   vSync, display,
-                    vSync000, vSync001, vSync010, vSync001,
+                    vSync000, vSync001, vSync010, vSync011,
                     vSync001, vSync001, vSync001, vSync001);
 
     mux8_4 vga_r(   VGA_R, display,
-                    VGA_R000, VGA_R001, VGA_R010, VGA_R001,
+                    VGA_R000, VGA_R001, VGA_R010, VGA_R011,
                     VGA_R001, VGA_R001, VGA_R001, VGA_R001);
     mux8_4 vga_g(   VGA_G, display,
-                    VGA_G000, VGA_R001, VGA_R010, VGA_R001,
+                    VGA_G000, VGA_R001, VGA_R010, VGA_R011,
                     VGA_G001, VGA_R001, VGA_R001, VGA_R001);
     mux8_4 vga_b(   VGA_B, display,
-                    VGA_B000, VGA_B001, VGA_B010, VGA_B001,
+                    VGA_B000, VGA_B001, VGA_B010, VGA_B011,
                     VGA_B001, VGA_B001, VGA_B001, VGA_B001);  
     
 
