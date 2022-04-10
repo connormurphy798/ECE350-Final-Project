@@ -10,6 +10,8 @@
 module VGAHomescreen(     
 	input clk, 			// 100 MHz System Clock
 	input reset, 		// Reset Signal
+	input[11:0] color0, // trim color
+	input[11:0] color1, // background color
 	output hSync, 		// H Sync Signal
 	output vSync, 		// Veritcal Sync Signal
 	output[3:0] VGA_R,  // Red Signal Bits
@@ -88,16 +90,12 @@ module VGAHomescreen(
 	
 
 	// Assign to output color from register if active
-	wire[BITS_PER_COLOR-1:0] colorOut, color0, color1;		  // Output color
-	assign color0 = 12'b001100110011; 	// black
-	assign color1 = 12'b111011101110;	// white
-	assign colorData = colorAddr ? color1 : color0;
-	assign colorOut = active ? colorData : color1; // When not active, output white
+	wire[BITS_PER_COLOR-1:0] colorOut;
 
 
 
 	wire button_color;
-	assign button_color = color0; // let's try black
+	assign button_color = color0;
 
 		// GAME
 	wire [7:0] g_l = 52;	wire [6:0] g_t = 50;	wire [7:0] g_r = 109;	wire [6:0] g_b = 53;
@@ -138,5 +136,5 @@ module VGAHomescreen(
 	
 	wire onSELECTION = onGAME | onCTRL | onSTGS;
 
-	assign {VGA_R, VGA_G, VGA_B} = onSELECTION ? color0 : colorOut;
+	assign {VGA_R, VGA_G, VGA_B} = onSELECTION | ~colorAddr ? color0 : color1;
 endmodule

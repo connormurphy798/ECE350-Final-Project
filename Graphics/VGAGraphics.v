@@ -41,7 +41,6 @@ module VGAGraphics(
     end
 
     wire [1:0] H;   // homescreen state
-    wire [1:0] P;   // color palette selection
     UserInterfaceFSM uifsm(curr, buttons, H, clk, 1'b1, reset | forcereset);
 
     // encode current state:
@@ -58,6 +57,12 @@ module VGAGraphics(
     assign display[0] = (       C2 & ~C1 & ~C0) |
                         (                   C0);
 
+    
+    // color palette
+    wire [1:0] P;   // color palette selection
+    wire [11:0] color0, color1;
+    ColorPalette palette(.c0(color0), .c1(color1), .chc(P));
+
 
     // -------------------- all the different possible VGA screens ------------------------
     
@@ -65,6 +70,7 @@ module VGAGraphics(
     wire hSync000, vSync000;
     wire [3:0] VGA_R000, VGA_G000, VGA_B000;
     VGAWelcome welcome( .clk(clk), .reset(reset),
+                        .color0(color0), .color1(color1),
 	                    .hSync(hSync000), .vSync(vSync000),
                         .VGA_R(VGA_R000), .VGA_G(VGA_G000), .VGA_B(VGA_B000),
                         .buttons(buttons)
@@ -74,6 +80,7 @@ module VGAGraphics(
     wire hSync001, vSync001;
     wire [3:0] VGA_R001, VGA_G001, VGA_B001;
     VGAHomescreen homescreen(   .clk(clk), .reset(reset),
+                                .color0(color0), .color1(color1),
 	                            .hSync(hSync001), .vSync(vSync001),
                                 .VGA_R(VGA_R001), .VGA_G(VGA_G001), .VGA_B(VGA_B001),
                                 .buttons(buttons), .fsm_en(~display[2] & ~display[1] & display[0]), .sel(H) 
@@ -83,6 +90,7 @@ module VGAGraphics(
     wire hSync010, vSync010;
     wire [3:0] VGA_R010, VGA_G010, VGA_B010;
     VGATestController controller(   .clk(clk), .reset(reset),
+                                    .color0(color0), .color1(color1),
 	                                .hSync(hSync010), .vSync(vSync010),
                                     .VGA_R(VGA_R010), .VGA_G(VGA_G010), .VGA_B(VGA_B010),
                                     .buttons(buttons)
@@ -92,6 +100,7 @@ module VGAGraphics(
     wire hSync011, vSync011;
     wire [3:0] VGA_R011, VGA_G011, VGA_B011;
     VGASettings settings(   .clk(clk), .reset(reset),
+                            .color0(color0), .color1(color1),
 	                        .hSync(hSync011), .vSync(vSync011),
                             .VGA_R(VGA_R011), .VGA_G(VGA_G011), .VGA_B(VGA_B011),
                             .buttons(buttons), .fsm_en(~display[2] &  display[1] & display[0]), .chc(P) 
@@ -110,8 +119,8 @@ module VGAGraphics(
                     VGA_R000, VGA_R001, VGA_R010, VGA_R011,
                     VGA_R001, VGA_R001, VGA_R001, VGA_R001);
     mux8_4 vga_g(   VGA_G, display,
-                    VGA_G000, VGA_R001, VGA_R010, VGA_R011,
-                    VGA_G001, VGA_R001, VGA_R001, VGA_R001);
+                    VGA_G000, VGA_G001, VGA_G010, VGA_G011,
+                    VGA_G001, VGA_G001, VGA_G001, VGA_G001);
     mux8_4 vga_b(   VGA_B, display,
                     VGA_B000, VGA_B001, VGA_B010, VGA_B011,
                     VGA_B001, VGA_B001, VGA_B001, VGA_B001);  

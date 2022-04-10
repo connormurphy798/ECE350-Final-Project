@@ -10,11 +10,13 @@
 module VGASettings(     
 	input clk, 			// 100 MHz System Clock
 	input reset, 		// Reset Signal
+	input[11:0] color0, // trim color
+	input[11:0] color1, // background color
 	output hSync, 		// H Sync Signal
 	output vSync, 		// Veritcal Sync Signal
 	output[3:0] VGA_R,  // Red Signal Bits
 	output[3:0] VGA_G,  // Green Signal Bits
-	output[3:0] VGA_B,  // Blue Signal Bits
+	output[3:0] VGA_B,  // D Signal Bits
 	input[7:0] buttons, // controller buttons
 	input fsm_en,		// enable homescreen fsm
 	output[1:0] chc		// current state (choice)
@@ -71,7 +73,7 @@ module VGASettings(
 	wire[PIXEL_ADDRESS_WIDTH-1:0] imgAddress;  	// Image address for the image data
 	assign imgAddress = x_adj + 160*y_adj; 		// Address calculated coordinate
 	wire colorAddr; 							// Color address for the color palette
-
+	
 	RAM #(		
 		.DEPTH(PIXEL_COUNT), 				     // Set RAM depth to contain every pixel
 		.DATA_WIDTH(PALETTE_ADDRESS_WIDTH),      // Set data width according to the color palette
@@ -84,78 +86,75 @@ module VGASettings(
 		.wEn(1'b0)); 						 // We're always reading
 
 	// Color Palette to Map Color Address to 12-Bit Color
-	wire[BITS_PER_COLOR-1:0] colorData; // 12-bit color data at current pixel
+	wire[11:0] colorData; // 12-bit color data at current pixel
 	
 
 	// Assign to output color from register if active
-	wire[BITS_PER_COLOR-1:0] colorOut, color0, color1;		  // Output color
-	assign color0 = 12'b001100110011; 	// black
-	assign color1 = 12'b111011101110;	// white
-	assign colorData = colorAddr ? color1 : color0;
-	assign colorOut = active ? colorData : color1; // When not active, output white
+	wire[BITS_PER_COLOR-1:0] colorOut;		  // Output color
+	//assign colorData = colorAddr ? color1 : color0;
 
 
 
 	wire button_color;
-	assign button_color = color0; // let's try black
+	assign button_color = color0;
 
-			// DEFAULT
-	wire [7:0] D0_l = 4;	wire [6:0] D0_t = 48;	wire [7:0] D0_r = 75;	wire [6:0] D0_b = 50;
-	wire [7:0] D1_l = 72;	wire [6:0] D1_t = 29;	wire [7:0] D1_r = 75;	wire [6:0] D1_b = 32;
+		// A
+	wire [7:0] A0_l = 4;	wire [6:0] A0_t = 48;	wire [7:0] A0_r = 75;	wire [6:0] A0_b = 50;
+	wire [7:0] A1_l = 72;	wire [6:0] A1_t = 29;	wire [7:0] A1_r = 75;	wire [6:0] A1_b = 32;
 
-		// GAMEBOY
-	wire [7:0] G0_l = 85;	wire [6:0] G0_t = 48;	wire [7:0] G0_r = 156;	wire [6:0] G0_b = 50;
-	wire [7:0] G1_l = 153;	wire [6:0] G1_t = 29;	wire [7:0] G1_r = 156;	wire [6:0] G1_b = 32;
+		// B
+	wire [7:0] B0_l = 85;	wire [6:0] B0_t = 48;	wire [7:0] B0_r = 156;	wire [6:0] B0_b = 50;
+	wire [7:0] B1_l = 153;	wire [6:0] B1_t = 29;	wire [7:0] B1_r = 156;	wire [6:0] B1_b = 32;
 
-    	// NIGHTMODE
-	wire [7:0] N0_l = 4;	wire [6:0] N0_t = 87;	wire [7:0] N0_r = 75;	wire [6:0] N0_b = 89;	
-	wire [7:0] N1_l = 72;	wire [6:0] N1_t = 68;	wire [7:0] N1_r = 75;	wire [6:0] N1_b = 71;
+    	// C
+	wire [7:0] C0_l = 4;	wire [6:0] C0_t = 87;	wire [7:0] C0_r = 75;	wire [6:0] C0_b = 89;	
+	wire [7:0] C1_l = 72;	wire [6:0] C1_t = 68;	wire [7:0] C1_r = 75;	wire [6:0] C1_b = 71;
 
-		// BLUE
-	wire [7:0] B0_l = 85;	wire [6:0] B0_t = 87;	wire [7:0] B0_r = 156;	wire [6:0] B0_b = 89;
-	wire [7:0] B1_l = 153;	wire [6:0] B1_t = 68;	wire [7:0] B1_r = 156;	wire [6:0] B1_b = 71;
+		// D
+	wire [7:0] D0_l = 85;	wire [6:0] D0_t = 87;	wire [7:0] D0_r = 156;	wire [6:0] D0_b = 89;
+	wire [7:0] D1_l = 153;	wire [6:0] D1_t = 68;	wire [7:0] D1_r = 156;	wire [6:0] D1_b = 71;
  
 		// inside a selection? 0 denotes mouseover, 1 denotes choice
-	reg inDFLT0, inDFLT1;
-	reg inGBOY0, inGBOY1;
-	reg inNGHT0, inNGHT1;
-	reg inBLUE0, inBLUE1;
+	reg inA0, inA1;
+	reg inB0, inB1;
+	reg inC0, inC1;
+	reg inD0, inD1;
 	always @(posedge clk25) begin
-	   	inDFLT0	<=	x_adj >= D0_l &
-					x_adj <  D0_r &
-					y_adj >= D0_t &
-					y_adj <  D0_b;
-		inDFLT1	<=	x_adj >= D1_l &
-					x_adj <  D1_r &
-					y_adj >= D1_t &
-					y_adj <  D1_b;
+	   	inA0	<=	x_adj >= A0_l &
+					x_adj <  A0_r &
+					y_adj >= A0_t &
+					y_adj <  A0_b;
+		inA1	<=	x_adj >= A1_l &
+					x_adj <  A1_r &
+					y_adj >= A1_t &
+					y_adj <  A1_b;
 		
-		inGBOY0	<=	x_adj >= G0_l &
-					x_adj <  G0_r &
-					y_adj >= G0_t &
-					y_adj <  G0_b;
-		inGBOY1	<=	x_adj >= G1_l &
-					x_adj <  G1_r &
-					y_adj >= G1_t &
-					y_adj <  G1_b;
-
-		inNGHT0	<=	x_adj >= N0_l &
-					x_adj <  N0_r &
-					y_adj >= N0_t &
-					y_adj <  N0_b;
-		inNGHT1	<=	x_adj >= N1_l &
-					x_adj <  N1_r &
-					y_adj >= N1_t &
-					y_adj <  N1_b;
-		
-		inBLUE0	<=	x_adj >= B0_l &
+		inB0	<=	x_adj >= B0_l &
 					x_adj <  B0_r &
 					y_adj >= B0_t &
 					y_adj <  B0_b;
-		inBLUE1	<=	x_adj >= B1_l &
+		inB1	<=	x_adj >= B1_l &
 					x_adj <  B1_r &
 					y_adj >= B1_t &
 					y_adj <  B1_b;
+
+		inC0	<=	x_adj >= C0_l &
+					x_adj <  C0_r &
+					y_adj >= C0_t &
+					y_adj <  C0_b;
+		inC1	<=	x_adj >= C1_l &
+					x_adj <  C1_r &
+					y_adj >= C1_t &
+					y_adj <  C1_b;
+		
+		inD0	<=	x_adj >= D0_l &
+					x_adj <  D0_r &
+					y_adj >= D0_t &
+					y_adj <  D0_b;
+		inD1	<=	x_adj >= D1_l &
+					x_adj <  D1_r &
+					y_adj >= D1_t &
+					y_adj <  D1_b;
 	end
 	
 
@@ -164,25 +163,25 @@ module VGASettings(
 	wire [1:0] sel;
     ColorsFSM fsm(sel, chc, buttons, clk, fsm_en, reset);
 	
-	wire onDFLT0, onDFLT1;
-	assign onDFLT0	= inDFLT0 & (~sel[1] & ~sel[0]);  // state 00 = DEFAULT
-	assign onDFLT1	= inDFLT1 & (~chc[1] & ~chc[0]);
+	wire onA0, onA1;
+	assign onA0	= inA0 & (~sel[1] & ~sel[0]);  // state 00 = A
+	assign onA1	= inA1 & (~chc[1] & ~chc[0]);
 
-	wire onGBOY0, onGBOY1;
-	assign onGBOY0	= inGBOY0 & (~sel[1] &  sel[0]);  // state 01 = GAMEBOY
-	assign onGBOY1	= inGBOY1 & (~chc[1] &  chc[0]);
+	wire onB0, onB1;
+	assign onB0	= inB0 & (~sel[1] &  sel[0]);  // state 01 = B
+	assign onB1	= inB1 & (~chc[1] &  chc[0]);
 
-	wire onNGHT0, onNGHT1;
-	assign onNGHT0	= inNGHT0 & ( sel[1] &  ~sel[0]);  // state 10 = NIGHTMODE
-	assign onNGHT1	= inNGHT1 & ( chc[1] &  ~chc[0]);
+	wire onC0, onC1;
+	assign onC0	= inC0 & ( sel[1] &  ~sel[0]);  // state 10 = C
+	assign onC1	= inC1 & ( chc[1] &  ~chc[0]);
 
-	wire onBLUE0, onBLUE1;
-	assign onBLUE0	= inBLUE0 & ( sel[1] &  sel[0]);  // state 11 = BLUE
-	assign onBLUE1	= inBLUE1 & ( chc[1] &  chc[0]);
+	wire onD0, onD1;
+	assign onD0	= inD0 & ( sel[1] &  sel[0]);  // state 11 = D
+	assign onD1	= inD1 & ( chc[1] &  chc[0]);
 
 	
-	wire onSELECTION 	= onDFLT0 | onGBOY0 | onNGHT0 | onBLUE0;
-	wire onCHOICE 		= onDFLT1 | onGBOY1 | onNGHT1 | onBLUE1;
+	wire onSELECTION 	= onA0 | onB0 | onC0 | onD0;
+	wire onCHOICE 		= onA1 | onB1 | onC1 | onD1;
 
-	assign {VGA_R, VGA_G, VGA_B} = onSELECTION | onCHOICE ? color0 : colorOut;
+	assign {VGA_R, VGA_G, VGA_B} = onSELECTION | onCHOICE | ~colorAddr ? color0 : color1;
 endmodule

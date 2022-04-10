@@ -11,6 +11,8 @@
 module VGATestController(     
 	input clk, 			// 100 MHz System Clock
 	input reset, 		// Reset Signal
+	input[11:0] color0, // trim color
+	input[11:0] color1, // background color
 	output hSync, 		// H Sync Signal
 	output vSync, 		// Veritcal Sync Signal
 	output[3:0] VGA_R,  // Red Signal Bits
@@ -87,16 +89,7 @@ module VGATestController(
 	
 
 	// Assign to output color from register if active
-	wire[BITS_PER_COLOR-1:0] colorOut, color0, color1;		  // Output color
-	assign color0 = 12'b001100110011; 	// black
-	assign color1 = 12'b111011101110;	// white
-	assign colorData = colorAddr ? color1 : color0;
-	assign colorOut = active ? colorData : color1; // When not active, output white
-
-
-
-	wire button_color;
-	assign button_color = color0; // let's try black
+	wire[BITS_PER_COLOR-1:0] colorOut;		  // Output color
 
 		// UP
 	wire [7:0] U_l = 41;	wire [6:0] U_t = 55;	wire [7:0] U_r = 46;	wire [6:0] U_b = 62;
@@ -181,5 +174,5 @@ module VGATestController(
 	wire onBUTTON_face = onA | onB | onC | onSTART;
 	wire onBUTTON = onBUTTON_dpad | onBUTTON_face;
 
-	assign {VGA_R, VGA_G, VGA_B} = onBUTTON ? color0 : colorOut;
+	assign {VGA_R, VGA_G, VGA_B} = onBUTTON | ~colorAddr ? color0 : color1;
 endmodule

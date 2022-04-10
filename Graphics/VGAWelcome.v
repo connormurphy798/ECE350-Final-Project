@@ -9,6 +9,8 @@
 module VGAWelcome(     
 	input clk, 			// 100 MHz System Clock
 	input reset, 		// Reset Signal
+	input[11:0] color0, // trim color
+	input[11:0] color1, // background color
 	output hSync, 		// H Sync Signal
 	output vSync, 		// Veritcal Sync Signal
 	output[3:0] VGA_R,  // Red Signal Bits
@@ -63,7 +65,7 @@ module VGAWelcome(
 		PIXEL_ADDRESS_WIDTH = $clog2(PIXEL_COUNT) + 1,           // Use built in log2 command
 		BITS_PER_COLOR = 12, 	  								 // Nexys A7 uses 12 bits/color
 		PALETTE_COLOR_COUNT = 2, 								 // Number of Colors available
-		PALETTE_ADDRESS_WIDTH = $clog2(PALETTE_COLOR_COUNT) + 1; // Use built in log2 Command
+		PALETTE_ADDRESS_WIDTH = 1;
 
 	wire[PIXEL_ADDRESS_WIDTH-1:0] imgAddress;  	// Image address for the image data
 	assign imgAddress = x_adj + 160*y_adj; 		// Address calculated coordinate
@@ -85,12 +87,9 @@ module VGAWelcome(
 	
 
 	// Assign to output color from register if active
-	wire[BITS_PER_COLOR-1:0] colorOut, color0, color1;		  // Output color
-	assign color0 = 12'b001100110011; 	// black
-	assign color1 = 12'b111011101110;	// white
+	wire[BITS_PER_COLOR-1:0] colorOut;		  // Output color
 	assign colorData = colorAddr ? color1 : color0;
-	assign colorOut = active ? colorData : color1; // When not active, output white
 
 
-	assign {VGA_R, VGA_G, VGA_B} = colorOut;
+	assign {VGA_R, VGA_G, VGA_B} = colorData;
 endmodule
