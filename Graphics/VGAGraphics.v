@@ -8,40 +8,24 @@
  `timescale 1 ns/ 100 ps
 module VGAGraphics(     
 	input clk, 			// 100 MHz System Clock
+    input clk25,
 	input reset, 		// Reset Signal
 	output hSync, 		// H Sync Signal
 	output vSync, 		// Veritcal Sync Signal
 	output[3:0] VGA_R,  // Red Signal Bits
 	output[3:0] VGA_G,  // Green Signal Bits
 	output[3:0] VGA_B,  // Blue Signal Bits
-	input pin0,
-	input pin1,
-	input pin2,
-	input pin3,
-	input pin5,
-	output pin6,
-	input pin8,
-	output[7:0] buttons,
     output[3:0] curr,
-    output screenEnd    // asserted for one cycle at the end of the current frame
+    output screenEnd,   // asserted for one cycle at the end of the current frame
+    input[7:0] buttons,
+    input gmem_en,
+    input [31:0] addr_gmem_IN,
+    input [7:0] x_coord_IN,
+    input [6:0] y_coord_IN,
+    input [1:0] imgcode_IN
     );
 
-    // Clock divider 100 MHz -> 25 MHz
-	wire clk25, clk125, clk0625, clk03125, clk015625;
 
-	reg[5:0] pixCounter = 0;      // Pixel counter to divide the clock
-    assign clk25 = pixCounter[1]; // Set the clock high whenever the second bit (2) is high
-    assign clk125 = pixCounter[2];
-    assign clk0625 = pixCounter[3];
-    assign clk03125 = pixCounter[4];
-    assign clk015625 = pixCounter[5];
-	always @(posedge clk) begin
-		pixCounter <= pixCounter + 1; // Since the reg is only 3 bits, it will reset every 8 cycles
-	end
-
-
-    // buttons
-    ControllerController ctrlr(buttons, pin0, pin1, pin2, pin3, pin5, pin6, pin8, clk015625);
 
     // get the current screen to be displayed
     reg forcereset = 1;
@@ -77,6 +61,22 @@ module VGAGraphics(
     wire [1:0] P;   // color palette selection
     wire [11:0] color0, color1;
     ColorPalette palette(.c0(color0), .c1(color1), .chc(P));
+
+
+    // processor interface
+    wire draw_OUT;                    // TODO: augment with sprite logic
+    wire [31:0] addr_gmem_OUT;
+    wire [7:0] x_coord_OUT;
+    wire [6:0] y_coord_OUT;
+    ProcVGAInterface procvga(.sysclk(clk25), .frclk(screenEnd),
+                            .gmem_en(gmem_en),
+                            .addr_gmem_IN(addr_gmem_IN),
+                            .x_coord_IN(x_coord_IN), .y_coord_IN(y_coord_IN),
+                            .imgcode_IN(imgcode_IN),
+                            .draw_OUT(draw_OUT),
+                            .addr_gmem_OUT(addr_gmem_OUT),
+                            .x_coord_OUT(x_coord_OUT), .y_coord_OUT(y_coord_OUT)
+    );
 
 
     // -------------------- all the different possible VGA screens ------------------------
@@ -134,7 +134,7 @@ module VGAGraphics(
                     .VGA_R(VGA_R100), .VGA_G(VGA_G100), .VGA_B(VGA_B100),
                     .buttons(buttons),
                     .screenEnd(screenEnd100),
-                    .bkg_en(bkg_en), .bkg_addr(bkg_addr), .bkg_x(bkg_x), .bkg_y(bkg_y)  
+                    .bkg_en(draw_OUT), .bkg_addr(addr_gmem_OUT), .bkg_x(x_coord_OUT), .bkg_y(y_coord_OUT)  
                     );
 
     
