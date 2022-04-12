@@ -21,10 +21,7 @@ module ControllerController(
     pin8,                       // C/Start  (in)    C when select, Start when ~select
 
     // DFF inputs
-    sysclk
-    //frclk,                      // frame clock - period is length of one frame
-    //en,
-    //clr   
+    clk
     );
 
 
@@ -32,20 +29,7 @@ module ControllerController(
     output [7:0] buttons;   // {Start, C, B, A, Right, Left, Down, Up}
 
     // Input from console
-    //input frclk, en, clr;
-    input sysclk;
-    reg frclk = 0;
-	reg [31:0] counter = 0;
-	reg [31:0] CounterLimit = 0;
-	always @(posedge sysclk) begin
-		CounterLimit <= 32;
-		if (counter < CounterLimit)
-			counter = counter + 1;
-		else begin
-			counter <= 0;
-			frclk <= ~frclk;
-		end
-	end
+    input clk;
         
     
     wire en, clr;
@@ -62,7 +46,7 @@ module ControllerController(
 
     // toggle select every frame
     reg select = 1;
-    always @(posedge frclk) begin
+    always @(posedge clk) begin
        select = ~select; 
     end
     assign pin6 = select;
@@ -74,35 +58,35 @@ module ControllerController(
     wire nslct_en = ~select & en; 
 
     // UP
-    dffe_ref UP(up, pin0, frclk, en, clr);
+    dffe_ref UP(up, pin0, clk, en, clr);
     assign buttons[0] = ~up;
 
     // DOWN
-    dffe_ref DOWN(down, pin1, frclk, en, clr);
+    dffe_ref DOWN(down, pin1, clk, en, clr);
     assign buttons[1] = ~down;
 
     // LEFT
-    dffe_ref LEFT(left, pin2, frclk, slct_en, clr);
+    dffe_ref LEFT(left, pin2, clk, slct_en, clr);
     assign buttons[2] = ~left;
 
     // RIGHT
-    dffe_ref RIGHT(right, pin3, frclk, slct_en, clr);
+    dffe_ref RIGHT(right, pin3, clk, slct_en, clr);
     assign buttons[3] = ~right;
 
     // A
-    dffe_ref A(a, pin5, frclk, nslct_en, clr);
+    dffe_ref A(a, pin5, clk, nslct_en, clr);
     assign buttons[4] = ~a;
 
     // B
-    dffe_ref B(b, pin5, frclk, slct_en, clr);
+    dffe_ref B(b, pin5, clk, slct_en, clr);
     assign buttons[5] = ~b;
 
     // C
-    dffe_ref C(c, pin8, frclk, slct_en, clr);
+    dffe_ref C(c, pin8, clk, slct_en, clr);
     assign buttons[6] = ~c;
     
     // START
-    dffe_ref START(start, pin8, frclk, nslct_en, clr);
+    dffe_ref START(start, pin8, clk, nslct_en, clr);
     assign buttons[7] = ~start;
 
 endmodule

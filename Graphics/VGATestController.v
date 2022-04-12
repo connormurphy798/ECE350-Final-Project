@@ -10,6 +10,7 @@
 `timescale 1 ns/ 100 ps
 module VGATestController(     
 	input clk, 			// 100 MHz System Clock
+	input clk25,
 	input reset, 		// Reset Signal
 	input[11:0] color0, // trim color
 	input[11:0] color1, // background color
@@ -18,27 +19,20 @@ module VGATestController(
 	output[3:0] VGA_R,  // Red Signal Bits
 	output[3:0] VGA_G,  // Green Signal Bits
 	output[3:0] VGA_B,  // Blue Signal Bits
-	input[7:0] buttons	// controller buttons
+	input[7:0] buttons, // controller buttons
+	output screenEnd	// high for one cycle when frame ends
 	);
 	
 	// Lab Memory Files Location
 	localparam FILES_PATH = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Graphics/MemFiles/";
-
-	// Clock divider 100 MHz -> 25 MHz
-	wire clk25; // 25MHz clock
-
-	reg[1:0] pixCounter = 0;      // Pixel counter to divide the clock
-    assign clk25 = pixCounter[1]; // Set the clock high whenever the second bit (2) is high
-	always @(posedge clk) begin
-		pixCounter <= pixCounter + 1; // Since the reg is only 3 bits, it will reset every 8 cycles
-	end
+	
 
 	// VGA Timing Generation for a Standard VGA Screen
 	localparam 
 		VIDEO_WIDTH = 640,  // Standard VGA Width
 		VIDEO_HEIGHT = 480; // Standard VGA Height
 
-	wire active, screenEnd;
+	wire active;
 	wire[9:0] x;
 	wire[8:0] y;
 	

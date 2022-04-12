@@ -29,4 +29,4 @@ def convertImage(imgfile, w, h, type=""):
 
 
 if __name__ == "__main__":
-    convertImage("bkg_colors", 160, 120, ".png")
+    convertImage("bkg_gmemtest", 160, 240, ".png")

@@ -9,6 +9,7 @@
 `timescale 1 ns/ 100 ps
 module VGASettings(     
 	input clk, 			// 100 MHz System Clock
+	input clk25,
 	input reset, 		// Reset Signal
 	input[11:0] color0, // trim color
 	input[11:0] color1, // background color
@@ -19,27 +20,20 @@ module VGASettings(
 	output[3:0] VGA_B,  // D Signal Bits
 	input[7:0] buttons, // controller buttons
 	input fsm_en,		// enable homescreen fsm
-	output[1:0] chc		// current state (choice)
+	output[1:0] chc,	// current state (choice)
+	output screenEnd	// high for one cycle when frame ends
 	);
 	
 	// Lab Memory Files Location
 	localparam FILES_PATH = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Graphics/MemFiles/";
 
-	// Clock divider 100 MHz -> 25 MHz
-	wire clk25; // 25MHz clock
-
-	reg[1:0] pixCounter = 0;      // Pixel counter to divide the clock
-    assign clk25 = pixCounter[1]; // Set the clock high whenever the second bit (2) is high
-	always @(posedge clk) begin
-		pixCounter <= pixCounter + 1; // Since the reg is only 3 bits, it will reset every 8 cycles
-	end
 
 	// VGA Timing Generation for a Standard VGA Screen
 	localparam 
 		VIDEO_WIDTH = 640,  // Standard VGA Width
 		VIDEO_HEIGHT = 480; // Standard VGA Height
 
-	wire active, screenEnd;
+	wire active;
 	wire[9:0] x;
 	wire[8:0] y;
 	
@@ -161,7 +155,7 @@ module VGASettings(
 
 	// Quickly assign the output colors to their channels using concatenation
 	wire [1:0] sel;
-    ColorsFSM fsm(sel, chc, buttons, clk, fsm_en, reset);
+    ColorsFSM fsm(sel, chc, buttons, clk25, fsm_en, reset);
 	
 	wire onA0, onA1;
 	assign onA0	= inA0 & (~sel[1] & ~sel[0]);  // state 00 = A
