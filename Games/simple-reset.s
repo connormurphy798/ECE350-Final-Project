@@ -64,3 +64,6 @@ MENU:
 EXIT:
     nop
     nop
+    nop
+    nop
+    j EXIT
