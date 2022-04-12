@@ -29,8 +29,8 @@ module VGAGame(
 	);
 	
 	// Lab Memory Files Location
-	//localparam FILES_PATH = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Graphics/MemFiles/";
-	localparam FILES_PATH = "./Graphics/MemFiles/";
+	localparam FILES_PATH = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Graphics/MemFiles/";
+	//localparam FILES_PATH = "./Graphics/MemFiles/";
 
 	// VGA Timing Generation for a Standard VGA Screen
 	localparam 
@@ -44,8 +44,8 @@ module VGAGame(
 	wire[7:0] x_adj = x >> 2;
 	wire[6:0] y_adj = y >> 2;
 	
-    wire[31:0] bkg_offset;
-    assign bkg_offset = bkg_en ? bkg_addr : 32'b0;
+    wire[31:0] bkg_offset = bkg_addr;
+    //assign bkg_offset = bkg_en ? bkg_addr : 32'b0;
 	
 	
 	VGATimingGenerator #(
@@ -70,14 +70,14 @@ module VGAGame(
 		PALETTE_ADDRESS_WIDTH = $clog2(PALETTE_COLOR_COUNT) + 1; // Use built in log2 Command
 
 	wire[PIXEL_ADDRESS_WIDTH-1:0] imgAddress;  	// Image address for the image data
-	assign imgAddress = x_adj + 160*y_adj + bkg_offset;
+	assign imgAddress = x_adj + 160*y_adj + bkg_offset[PIXEL_ADDRESS_WIDTH-1:0];
 	wire colorAddr; 							// Color address for the color palette
 
 	GRAM #(		
 		.DEPTH(PIXEL_COUNT*2), 				     // Set RAM depth to contain every pixel
 		.DATA_WIDTH(1),      // Set data width according to the color palette
 		.ADDRESS_WIDTH(PIXEL_ADDRESS_WIDTH),     // Set address with according to the pixel count
-		.MEMFILE({FILES_PATH, "bkg_gmemtest.mem"})) 	// Memory initialization
+		.MEMFILE({FILES_PATH, "bkg_patterntest2.mem"})) 	// Memory initialization
 	GMEM_bkg(
 		.clk(clk), 						 // Falling edge of the 100 MHz clk
 		.addr(imgAddress),					 // Image data address

@@ -20,7 +20,7 @@ beq $state, $r2, MENU
 
           #OPENING SCREEN FOR GAME
 OPENING:
-        bbp 7, start_OPEN
+        bbp 0, start_OPEN
         j OPEN_DONE
 
         start_OPEN:                         # on START press
@@ -37,7 +37,7 @@ OPENING:
 
           #DIRECTIONAL BUTTONS CONTROL SPRITE MOVEMENT
 GAMEPLAY:
-        bbp 7, start_GAME
+        bbp 0, start_GAME
         j GAME_DONE
 
         start_GAME:                         # on START press
