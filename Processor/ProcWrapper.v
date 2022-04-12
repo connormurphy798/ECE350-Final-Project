@@ -8,9 +8,9 @@
 module ProcWrapper (clock, reset);
 	input clock, reset;
 
-	wire rwe, mwe, iwe;
+	wire rwe, mwe;
 	wire[4:0] rd, rs1, rs2, rs3;
-	wire[31:0] instAddr, instData, instDataIn, 
+	wire[31:0] instAddr, instData, 
 		rData, regA, regB, regC,
 		memAddr, memDataIn, memDataOut;
 	wire [7:0] buttons;
@@ -21,15 +21,10 @@ module ProcWrapper (clock, reset);
 	
 	// Main Processing Unit
 	processor CPU(.clock(clock), .reset(reset), 
-		/**	   OLD VERSION WITH MEM FILE				
+								
 		// ROM
 		.address_imem(instAddr), .q_imem(instData),
-		**/
-
-		//instRAM
-		.address_imem(insAddr), .q_imem(instData),
-		.iwren(iwe), .data_imem(instDataIn),
-
+									
 		// Regfile
 		.ctrl_writeEnable(rwe),     .ctrl_writeReg(rd),
 		.ctrl_readRegA(rs1),     .ctrl_readRegB(rs2), 
@@ -42,22 +37,12 @@ module ProcWrapper (clock, reset);
 		// Controller
 		.controller(buttons)); 
 	
-	/**     OLD VERSION WITH MEM FILE
 	// Instruction Memory (ROM)
 	ROM #(.MEMFILE({INSTR_FILE, ".mem"}))
 	InstMem(.clk(clock), 
 		.addr(instAddr[11:0]), 
 		.dataOut(instData));
-	**/
-
-	// Instruction Memory (RAM)
-	// read from SD card
-	RAM InstMem(.clk(clock),
-		.wEn(iwe),
-		.addr(instAddr[11:0]),
-		.dataIn(instDataIn),
-		.dataOut(instData));
-
+	
 	// Register File
 	regfile RegisterFile(.clock(clock), 
 		.ctrl_writeEnable(rwe), .ctrl_reset(reset), 

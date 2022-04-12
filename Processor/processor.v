@@ -11,8 +11,6 @@ module processor(
     // Imem
     address_imem,                   // O: The address of the data to get from imem
     q_imem,                         // I: The data from imem
-    iwren,                          // O: Write enable for imem
-    data_imem,                      // O: The data to write to imem
 
     // Dmem
     address_dmem,                   // O: The address of the data to get or put from/to dmem
@@ -47,9 +45,8 @@ module processor(
 	input clock, reset;
 	
 	// Imem
-    output [31:0] address_imem, data_imem;
+    output [31:0] address_imem;
 	input [31:0] q_imem;
-    output iwren;
 
 	// Dmem
 	output [31:0] address_dmem, data;

@@ -74,7 +74,7 @@ func assemble(assemblyFile []string, assemblerISA ISA, outputBase string, output
 
 		fields := strings.Fields(strings.ReplaceAll(instr, ",", ""))
 
-		fmt.Println(fields)
+		//fmt.Println(fields)
 
 		assembledInstr := assembleInstruction(fields)
 
