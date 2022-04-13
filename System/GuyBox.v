@@ -75,7 +75,7 @@ module GuyBox (
 					.gmem_en(gmem_en), .addr_gmem_IN(address_gmem),
 					.x_coord_IN(x_coord[7:0]), .y_coord_IN(y_coord[6:0]),
 					.imgcode_IN(sprite[1:0]));
-
+					
 
 	// ADD YOUR MEMORY FILE HERE
 	localparam INSTR_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Games/simple-reset";

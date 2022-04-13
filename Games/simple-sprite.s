@@ -21,10 +21,16 @@ beq $state, $r2, MENU
           #OPENING SCREEN FOR GAME
 OPENING:
         bbp 7, start_OPEN
+        bne $r19, $r0, change_to_game
         j OPEN_DONE
 
         start_OPEN:                         # on START press
-            addi $state, $r0, 1             # switch to gameplay state
+            addi $r19, $r0, 1               # put one in STARTbuff
+            j OPEN_DONE
+
+        change_to_game:
+            addi $r19, $r0, 0               #reset STARTbuff
+            addi $state, $r0, 1             #change to game state
             j OPEN_DONE
 
 
@@ -65,3 +71,6 @@ MENU:
 EXIT:
     nop
     nop
+    nop
+    nop
+    j EXIT

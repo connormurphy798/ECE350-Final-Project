@@ -64,18 +64,27 @@ module VGAGraphics(
 
 
     // processor interface
-    wire draw_OUT;                    // TODO: augment with sprite logic
-    wire [31:0] addr_gmem_OUT;
-    wire [7:0] x_coord_OUT;
-    wire [6:0] y_coord_OUT;
+    wire draw_BKG;
+    wire [31:0] addr_gmem_BKG;
+    wire [7:0] x_coord_BKG;
+    wire [6:0] y_coord_BKG;
+
+    wire draw_SP1;
+    wire [31:0] addr_gmem_SP1;
+    wire [7:0] x_coord_SP1;
+    wire [6:0] y_coord_SP1;
+
     ProcVGAInterface procvga(.sysclk(clk25), .frclk(screenEnd),
                             .gmem_en(gmem_en),
                             .addr_gmem_IN(addr_gmem_IN),
                             .x_coord_IN(x_coord_IN), .y_coord_IN(y_coord_IN),
                             .imgcode_IN(imgcode_IN),
-                            .draw_OUT(draw_OUT),
-                            .addr_gmem_OUT(addr_gmem_OUT),
-                            .x_coord_OUT(x_coord_OUT), .y_coord_OUT(y_coord_OUT)
+
+                            .draw_BKG(draw_BKG), .addr_gmem_BKG(addr_gmem_BKG),
+                            .x_coord_BKG(x_coord_BKG), .y_coord_BKG(y_coord_BKG),
+
+                            .draw_SP1(draw_SP1), .addr_gmem_SP1(addr_gmem_SP1),
+                            .x_coord_SP1(x_coord_SP1), .y_coord_SP1(y_coord_SP1)
     );
 
 
@@ -134,7 +143,8 @@ module VGAGraphics(
                     .VGA_R(VGA_R100), .VGA_G(VGA_G100), .VGA_B(VGA_B100),
                     .buttons(buttons),
                     .screenEnd(screenEnd100),
-                    .bkg_en(draw_OUT), .bkg_addr(addr_gmem_OUT), .bkg_x(x_coord_OUT), .bkg_y(y_coord_OUT)  
+                    .bkg_en(draw_BKG), .bkg_addr(addr_gmem_BKG), .bkg_x(x_coord_BKG), .bkg_y(y_coord_BKG),
+                    .sp1_en(draw_SP1), .sp1_addr(addr_gmem_SP1), .sp1_x(x_coord_SP1), .sp1_y(y_coord_SP1) 
                     );
 
     

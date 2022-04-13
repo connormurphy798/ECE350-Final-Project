@@ -24,8 +24,13 @@ module VGAGame(
     input bkg_en,
     input[31:0] bkg_addr,
     input[7:0] bkg_x,
-    input[6:0] bkg_y
-    
+    input[6:0] bkg_y,
+
+	// sp1
+    input sp1_en,
+    input[31:0] sp1_addr,
+    input[7:0] sp1_x,
+    input[6:0] sp1_y
 	);
 	
 	// Lab Memory Files Location
@@ -68,24 +73,59 @@ module VGAGame(
 		BITS_PER_COLOR = 12, 	  								 // Nexys A7 uses 12 bits/color
 		PALETTE_COLOR_COUNT = 2, 								 // Number of Colors available
 		PALETTE_ADDRESS_WIDTH = $clog2(PALETTE_COLOR_COUNT) + 1; // Use built in log2 Command
+				
 
-	wire[PIXEL_ADDRESS_WIDTH-1:0] imgAddress;  	// Image address for the image data
-	assign imgAddress = x_adj + 160*y_adj + bkg_offset[PIXEL_ADDRESS_WIDTH-1:0];
-	wire colorAddr; 							// Color address for the color palette
-
+	wire colorData;
+		
+	// bkg GMEM
+	wire[PIXEL_ADDRESS_WIDTH-1:0] imgAddress_bkg;  	
+	assign imgAddress_bkg = x_adj + 160*y_adj + bkg_offset[PIXEL_ADDRESS_WIDTH-1:0];
+	wire colorAddr_bkg; 							
 	GRAM #(		
-		.DEPTH(PIXEL_COUNT*2), 				     // Set RAM depth to contain every pixel
-		.DATA_WIDTH(1),      // Set data width according to the color palette
-		.ADDRESS_WIDTH(PIXEL_ADDRESS_WIDTH),     // Set address with according to the pixel count
-		.MEMFILE({FILES_PATH, "bkg_patterntest2.mem"})) 	// Memory initialization
-	GMEM_bkg(
-		.clk(clk), 						 // Falling edge of the 100 MHz clk
-		.addr(imgAddress),					 // Image data address
-		.dataOut(colorAddr),				 // Color palette address
-		.wEn(1'b0)); 						 // We're always reading
+		.DEPTH(PIXEL_COUNT*2), 
+		.DATA_WIDTH(1),      
+		.ADDRESS_WIDTH(PIXEL_ADDRESS_WIDTH),     
+		.MEMFILE({FILES_PATH, "bkg_patterntest2.mem"}))
+	GMEM_160by120(
+		.clk(clk), 						
+		.addr(imgAddress_bkg),			
+		.dataOut(colorAddr_bkg),
+		.wEn(1'b0)); 						
+	
+	// sprite GMEM
+	wire[8:0] imgAddress_sp1;  	
+	assign imgAddress_sp1 = (x_adj - sp1_x) + 16*(y_adj - sp1_y) + sp1_addr[8:0];
+	wire colorAddr_sp1; 
+	GRAM #(		
+		.DEPTH(256*2), 
+		.DATA_WIDTH(1),   
+		.ADDRESS_WIDTH(9), 
+		.MEMFILE({FILES_PATH, "sp_guy0.mem"}))
+	GMEM_16by16(
+		.clk(clk), 						 
+		.addr(imgAddress_sp1),
+		.dataOut(colorAddr_sp1),	
+		.wEn(1'b0)); 			
+	
+
+
+	// draw sprite 1
+	wire [7:0] sp1_l = sp1_x;		wire [6:0] sp1_t = sp1_y;
+	wire [7:0] sp1_r = sp1_x + 16;	wire [6:0] sp1_b = sp1_y + 16;
+	reg in_sp1;	
+	always @(posedge clk25) begin
+		in_sp1	<=	x_adj >= sp1_l &
+					x_adj <  sp1_r &
+					y_adj >= sp1_t &
+					y_adj <  sp1_b;
+	end
+
+	
+	// color data
+	assign colorData = in_sp1 & sp1_en ? colorAddr_sp1 : colorAddr_bkg;
     
 
 
 
-	assign {VGA_R, VGA_G, VGA_B} = ~colorAddr ? color0 : color1;
+	assign {VGA_R, VGA_G, VGA_B} = ~colorData ? color0 : color1;
 endmodule

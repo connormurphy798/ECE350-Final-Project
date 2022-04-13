@@ -27,6 +27,9 @@ def convertImage(imgfile, w, h, type=""):
     mem.close()
 
 
+# TODO: write function to combine multiple existing .mem files
+
+
 
 if __name__ == "__main__":
-    convertImage("bkg_patterntest2", 160, 240, ".png")
+    convertImage("sp_guy0", 16, 16, ".png")
