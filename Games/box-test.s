@@ -11,22 +11,29 @@
 addi $r1, $r0, 1                                    # for state 1 comparison
 addi $r2, $r0, 2                                    # for state 2 comparison
 
-beq $state, $r0, OPENING
-beq $state, $r1, GAMEPLAY
-beq $state, $r2, MENU
+beq $state, $r0, OPENING                            #  OPENING = state 0
+beq $state, $r1, GAMEPLAY                           # GAMEPLAY = state 1
+beq $state, $r2, MENU                               #     MENU = state 2
 
 
 
 #OPENING SCREEN FOR GAME
 OPENING:
     bbp 7, start_OPEN
+    bne $state_buff, $r0, change_to_game
     j OPEN_DONE
 
     start_OPEN:                                 # on START press
-        addi $state, $r0, 1                     # switch to gameplay state
+        addi $state_buff, $r0, 1                # put 1 into state buffer
         j OPEN_DONE
 
+    change_to_game:
+        addi $state_buff, $r0, 0                # reset state buffer
+        addi $state, $r0, 1                     # change to GAMEPLAY state
 
+        ######## INITIALIZE SPRITE POSITION ########
+
+        j OPEN_DONE
 
     OPEN_DONE:
         #ren bkg, $r0, $r0, $bkg                # render background
@@ -38,6 +45,7 @@ OPENING:
 #DIRECTIONAL BUTTONS CONTROL SPRITE MOVEMENT
 GAMEPLAY:
     bbp 7, start_GAME
+    bne $state_buff, $r0, change_to_menu
     bbp 0, up_GAME
     bbp 1, down_GAME
     bbp 2, left_GAME
@@ -46,7 +54,7 @@ GAMEPLAY:
     j GAMEPLAY_DONE
 
     start_GAME:                                 # on START press
-            addi $state, $r0, 2                 # switch to opening state
+            addi $state_buff, $r0, 1            # put 1 into state buffer
             j GAMEPLAY_DONE
 
     up_GAME:                                    # on UP press
@@ -102,6 +110,14 @@ GAMEPLAY:
             j GAMEPLAY_DONE
 
 
+    change_to_menu:
+            addi $state_buff, $r0, 0            # reset state buffer
+            addi $state, $r0, 2                 # change to MENU state
+
+            ######## INITIALIZE WHICH MENU BACKGROUND INTO $bkg ########
+
+            j GAMEPLAY_DONE
+
 
     GAMEPLAY_DONE:
             #ren bkg, $r0, $r0, $bkg            # render background
@@ -115,15 +131,54 @@ GAMEPLAY:
 
 #DIRECTIONAL BUTTONS DON'T CONTROL SPRITE MOVEMENT
 MENU:
+    addi $r1, $r0, 1                            # for state_buff comparison
+    addi $r2, $r0, 2                            # |
+
     bbp 7, start_MENU
+    bbp 4, a_MENU
+    beq $state_buff, $r1, menu_change_to_game
+    beq $state_buff, $r2, exit_game
+    bbp 2, left_MENU
+    bbp 3, right_MENU
+    
     j MENU_DONE
 
-    start_OPEN:                                 # on START press
-            addi $state, $r0, 0                 # switch to opening state
+    start_MENU:                                 # on START press
+            addi $state_buff, $r0, 1            # put 1 into state buffer
+            j MENU_DONE
+
+    a_MENU:                                     # on A press
+            #addi $r1, $r0, VAL_OF_EXIT_GAME_SELECTED_BKG
+            #beq $bkg, $r1, do_quit
+            addi $state_buff, $r0, 1            # put 1 into state buffer
+            j MENU_DONE
+
+            do_quit:
+                addi $state_buff, $r0, 2        # put 2 into state buffer
+                j MENU_DONE
+
+    left_MENU:                                  # on LEFT press
+            #addi $bkg, $r0, VAL_OF_RESUME_SELECTED_BKG
+            j MENU_DONE
+
+    right_MENU:                                 # on RIGHT press
+            #addi $bkg, $r0, VAL_OF_EXIT_GAME_SELECTED_BKG
+            j MENU_DONE
+
+    menu_change_to_game:
+            addi $state_buff, $r0, 0            # reset state buffer
+            addi $state, $r0, 1                 # change to GAMEPLAY state
+            j MENU_DONE
+
+    exit_game:
+            addi $state_buff, $r0, 0            # reset state buffer
+            addi $state, $r0, 2                 # keep in pause menu when returning from quit
+            QUITGAME $r0                        # quits game and keeps progress saved
             j MENU_DONE
 
 
     MENU_DONE:
+            #ren bkg, $r0, $r0, $bkg            # render background
             j EXIT
 
 
@@ -132,4 +187,4 @@ MENU:
 EXIT:
     nop
     nop
-    j EXIT                                          # loop until frame reset
+    j EXIT                                      # loop until frame reset
