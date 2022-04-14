@@ -168,5 +168,5 @@ module VGATestController(
 	wire onBUTTON_face = onA | onB | onC | onSTART;
 	wire onBUTTON = onBUTTON_dpad | onBUTTON_face;
 
-	assign {VGA_R, VGA_G, VGA_B} = onBUTTON | ~colorAddr ? color0 : color1;
+	assign {VGA_R, VGA_G, VGA_B} = ~onBUTTON & ~colorAddr ? color0 : color1;
 endmodule

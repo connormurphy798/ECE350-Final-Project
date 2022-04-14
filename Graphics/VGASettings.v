@@ -177,5 +177,5 @@ module VGASettings(
 	wire onSELECTION 	= onA0 | onB0 | onC0 | onD0;
 	wire onCHOICE 		= onA1 | onB1 | onC1 | onD1;
 
-	assign {VGA_R, VGA_G, VGA_B} = onSELECTION | onCHOICE | ~colorAddr ? color0 : color1;
+	assign {VGA_R, VGA_G, VGA_B} = ~onSELECTION & ~onCHOICE & ~colorAddr ? color0 : color1;
 endmodule

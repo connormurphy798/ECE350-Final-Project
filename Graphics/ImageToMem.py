@@ -27,9 +27,57 @@ def convertImage(imgfile, w, h, type=""):
     mem.close()
 
 
+def invertMem(memfile, w, h, inPlace=False):
+    """
+    inverts memfile of dimensions (w,h) such that
+    all bits are complemented.
+    optionally can invert a file into itself if inPlace=True.
+    """
+    mem = open("Graphics/MemFiles/" + memfile + ".mem", "r")
+    print("Inverting " + memfile + ".mem...")
+
+    # invert into another file
+    if not inPlace:
+        inv = open("Graphics/MemFiles/" + memfile + "_inv.mem", "w")
+
+        # write to mem file
+        for j in range(h):
+            rLine = mem.readline().split()
+            wLine = []
+            for i in range(w):
+                num = rLine[i]
+                wLine.append(str(1-int(num)))    # 0 -> 1, 1 -> 0
+            inv.write(" ".join(wLine) + "\n")
+        mem.close()
+        inv.close()
+    
+    # invert into the same file
+    else:
+        lines = mem.readlines()
+        mem.close()
+        mem = open("Graphics/MemFiles/" + memfile + ".mem", "w")
+        for j in range(h):
+            rLine = lines[j].split()
+            wLine = []
+            for i in range(w):
+                num = rLine[i]
+                wLine.append(str(1-int(num)))    # 0 -> 1, 1 -> 0
+            mem.write(" ".join(wLine) + "\n")
+        mem.close()
+
+
 # TODO: write function to combine multiple existing .mem files
 
 
 
 if __name__ == "__main__":
-    convertImage("bkg_boxtest", 160, 480, ".png")
+    pass
+    # convertImage("bkg_boxtest", 160, 480, ".png")
+    # invertMem("bkg_boxtest", 160, 480, inPlace=True)
+    # invertMem("bkg_colors", 160, 120, inPlace=True)
+    # invertMem("bkg_controller", 160, 120, inPlace=True)
+    # invertMem("bkg_gmemtest", 160, 240, inPlace=True)
+    # invertMem("bkg_homescreen", 160, 120, inPlace=True)
+    # invertMem("bkg_patterntest", 160, 120, inPlace=True)
+    # invertMem("bkg_patterntest2", 160, 240, inPlace=True)
+    # invertMem("bkg_welcome", 160, 120, inPlace=True)

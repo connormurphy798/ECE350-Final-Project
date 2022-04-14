@@ -130,5 +130,5 @@ module VGAHomescreen(
 	
 	wire onSELECTION = onGAME | onCTRL | onSTGS;
 
-	assign {VGA_R, VGA_G, VGA_B} = onSELECTION | ~colorAddr ? color0 : color1;
+	assign {VGA_R, VGA_G, VGA_B} = ~onSELECTION & ~colorAddr ? color0 : color1;
 endmodule

@@ -58,8 +58,8 @@ module GuyBox (
 		memAddr, memDataIn, memDataOut;
 	wire quit, reset_rf, QUIT, RESET_RF;
 
-	dffe_ref dffQUIT(QUIT, quit, clk25, 1'b1, 1'b0);
-	dffe_ref dffRSRF(RESET_RF, reset_rf, clk25, 1'b1, 1'b0);
+	dffe_ref dffQUIT(QUIT, quit, screenEnd, 1'b1, 1'b0);
+	dffe_ref dffRSRF(RESET_RF, reset_rf, screenEnd, 1'b1, 1'b0);
 
 
     // Sega Genesis controller interface
@@ -87,7 +87,7 @@ module GuyBox (
 	//localparam INSTR_FILE = "./Games/simple-sprite";
 
 	// Main Processing Unit
-	processor CPU(.clock(clk25), .reset(reset | screenEnd | ~curr[3] | QUIT), 
+	processor CPU(.clock(clk25), .reset(reset | screenEnd | ~curr[3]), 
 								
 		// ROM
 		.address_imem(instAddr), .q_imem(instData),
