@@ -37,11 +37,11 @@ module ColorsFSM(color_sel, color_chc, buttons, clk, en, rst);
 
     
     // d flip flops
-    dffe_ref Q1_S(color_sel[1], next_sel[1], clk, en, rst);     // selection - always enabled
-    dffe_ref Q0_S(color_sel[0], next_sel[0], clk, en, rst);
+    dffe_ref Q1_S(color_sel[1], next_sel[1], clk, en, 0'b0);     // selection - always enabled
+    dffe_ref Q0_S(color_sel[0], next_sel[0], clk, en, 0'b0);
 
-    dffe_ref Q1_C(color_chc[1], next_sel[1], clk, en & A, rst); // choice - enabled only when A pressed
-    dffe_ref Q0_C(color_chc[0], next_sel[0], clk, en & A, rst);
+    dffe_ref Q1_C(color_chc[1], next_sel[1], clk, en & A, 0'b0); // choice - enabled only when A pressed
+    dffe_ref Q0_C(color_chc[0], next_sel[0], clk, en & A, 0'b0);
 
     
 endmodule
