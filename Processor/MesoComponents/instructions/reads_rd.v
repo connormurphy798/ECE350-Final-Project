@@ -18,7 +18,8 @@ module reads_rd(reads, instr);
                 (~o4 & ~o3 &  o2 & ~o1 & ~o0);  // 00100 jr
     assign r2 = ( o4 &  o3 & ~o2 & ~o1 &  o0) | // 11001 beq
                 ( o4 & ~o3 &  o2 &  o1 & ~o0) | // 10110 bex
-                ( o4 &  o3 & ~o2 &  o1 & ~o0);  // 11010 ren
+                ( o4 &  o3 & ~o2 &  o1 & ~o0) | // 11010 ren
+                ( o4 &  o3 &  o2 &  o1 &  o0);  // 11111 QUITGAME
 
     assign reads  = r1 | r2;
 

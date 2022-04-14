@@ -37,7 +37,11 @@ module processor(
     x_coord,                        // O: The x [0,160) coordinate at which to display the image
     y_coord,                        // O: The y [0,120) coordinate at which to display the image
     sprite,                         // O: Sprite code [0,2] for the image to be displayed
-    gmem_en                         // O: Flag that is asserted when graphics output is valid
+    gmem_en,                        // O: Flag that is asserted when graphics output is valid
+
+    // Game State
+    quit,                           // O: Signal to quit to welcome screen
+    reset_rf                        // O: Signal to reset regfile on quit
 	 
 	);
 
@@ -69,6 +73,10 @@ module processor(
     output [11:0] sprite;
     output gmem_en;
 
+    // Game State
+    output quit;
+    output reset_rf;
+
 
 
 
@@ -94,6 +102,7 @@ module processor(
     wire ALUinB_X, ctrl_MULT_X, ctrl_DIV_X, 
             jb_X, jal_X, setx_X, ren_X, neq_X, lt_X;                        // X 1-bit control
     wire [11:0] sprite_X;                                                   // X other control
+    wire [1:0] quitgame_X;      
     
     wire [1:0] ALUinA_bypass, ALUinB_bypass, ValC_bypass;                   // bypassing mux select bits
     wire MemData_bypass, MULTDIVinA_bypass, MULTDIVinB_bypass,
@@ -221,7 +230,7 @@ module processor(
     // --------------------------------------------------------------------------------------------------------------------------
 
     // control
-    X_control x_ctrl(ALUinB_X, imm32_X, ALUop_X, shamt_X, ctrl_MULT_X, ctrl_DIV_X, jb_X, PC_alt, jal_X, setx_X, ren_X, sprite_X,
+    X_control x_ctrl(ALUinB_X, imm32_X, ALUop_X, shamt_X, ctrl_MULT_X, ctrl_DIV_X, jb_X, PC_alt, jal_X, setx_X, ren_X, sprite_X, quitgame_X,
                         INSTR_DX, PC_DX, ALU_input_B_pre, neq_X, lt_X, ALU_input_B_pre, (excpt_XM | excpt_MW | excpt_CW | md_excpt), controller);
 
     // bypassing 
@@ -255,6 +264,11 @@ module processor(
     assign x_coord      = ALU_input_A;
     assign y_coord      = ALU_input_B_pre;
     assign address_gmem = Val_C;
+
+    // quit game
+    assign quit     = quitgame_X[0];
+    assign reset_rf = quitgame_X[1]; 
+
 
     // pass instruction to next stage
     assign INSTR_into_XM = jb_X & ~jal_X ? 32'b0 : INSTR_DX;

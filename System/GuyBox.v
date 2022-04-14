@@ -56,6 +56,7 @@ module GuyBox (
 	wire[31:0] instAddr, instData, 
 		rData, regA, regB, regC,
 		memAddr, memDataIn, memDataOut;
+	wire quit, reset_rf;
 
 
     // Sega Genesis controller interface
@@ -68,16 +69,16 @@ module GuyBox (
     wire [31:0] y_coord;
     wire [11:0] sprite;
     wire gmem_en, screenEnd;
-	VGAGraphics vga(.clk(clk), .clk25(clk25), .reset(reset),
+	VGAGraphics vga(.clk(clk), .clk25(clk25), .reset(reset | quit),
 					.hSync(hSync), .vSync(vSync),
 					.VGA_R(VGA_R), .VGA_G(VGA_G), .VGA_B(VGA_B),
 					.curr(curr), .screenEnd(screenEnd), .buttons(buttons),
 					.gmem_en(gmem_en), .addr_gmem_IN(address_gmem),
 					.x_coord_IN(x_coord[7:0]), .y_coord_IN(y_coord[6:0]),
 					.imgcode_IN(sprite[1:0]));
-					
+		
 
-	// ADD YOUR MEMORY FILE HERE
+	
 	localparam INSTR_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Games/simple-sprite";
 	//localparam INSTR_FILE = "./Games/simple-sprite";
 
@@ -100,7 +101,10 @@ module GuyBox (
 		.controller(buttons),
         
         // Graphics
-        .address_gmem(address_gmem), .x_coord(x_coord), .y_coord(y_coord), .sprite(sprite), .gmem_en(gmem_en)
+        .address_gmem(address_gmem), .x_coord(x_coord), .y_coord(y_coord), .sprite(sprite), .gmem_en(gmem_en),
+
+		// Quit Game
+		.quit(quit), .reset_rf(reset_rf)
     
     ); 
 	
@@ -112,7 +116,7 @@ module GuyBox (
 	
 	// Register File
 	regfile RegisterFile(.clock(clk25), 
-		.ctrl_writeEnable(rwe), .ctrl_reset(reset), 
+		.ctrl_writeEnable(rwe), .ctrl_reset(reset | reset_rf), 
 		.ctrl_writeReg(rd),
 		.ctrl_readRegA(rs1), .ctrl_readRegB(rs2), .ctrl_readRegC(rs3),
 		.data_writeReg(rData), .data_readRegA(regA), .data_readRegB(regB), .data_readRegC(regC));

@@ -24,7 +24,7 @@ OPENING:
 
         addi $s1_x, $r0, 20                         # initialize sp1 starting coords
         addi $s1_y, $r0, 60
-        
+
         bne $r19, $r0, change_to_game
         j OPEN_DONE
 
@@ -62,11 +62,17 @@ GAMEPLAY:
         add $s1_x, $s1_x, $r5
 
 
+        bbp 6, QUIT                         # quit if C is pressed 
+
         j GAME_DONE
 
         start_GAME:                         # on START press
             addi $state, $r0, 0             # switch to opening state
             j GAME_DONE
+        
+
+        QUIT:
+            QUITGAME $r0
 
 
 
