@@ -56,7 +56,10 @@ module GuyBox (
 	wire[31:0] instAddr, instData, 
 		rData, regA, regB, regC,
 		memAddr, memDataIn, memDataOut;
-	wire quit, reset_rf;
+	wire quit, reset_rf, QUIT, RESET_RF;
+
+	dffe_ref dffQUIT(QUIT, quit, clk25, 1'b1, 1'b0);
+	dffe_ref dffRSRF(RESET_RF, reset_rf, clk25, 1'b1, 1'b0);
 
 
     // Sega Genesis controller interface
@@ -69,7 +72,7 @@ module GuyBox (
     wire [31:0] y_coord;
     wire [11:0] sprite;
     wire gmem_en, screenEnd;
-	VGAGraphics vga(.clk(clk), .clk25(clk25), .reset(reset | quit),
+	VGAGraphics vga(.clk(clk), .clk25(clk25), .reset(reset | QUIT),
 					.hSync(hSync), .vSync(vSync),
 					.VGA_R(VGA_R), .VGA_G(VGA_G), .VGA_B(VGA_B),
 					.curr(curr), .screenEnd(screenEnd), .buttons(buttons),
@@ -80,11 +83,11 @@ module GuyBox (
 
 	
 	localparam INSTR_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Games/box-test";
-	//localparam DATA_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Graphics/MemFiles/bkg_boxtest";
+	localparam DATA_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Graphics/MemFiles/bkg_boxtest";
 	//localparam INSTR_FILE = "./Games/simple-sprite";
 
 	// Main Processing Unit
-	processor CPU(.clock(clk25), .reset(reset | screenEnd | ~curr[3]), 
+	processor CPU(.clock(clk25), .reset(reset | screenEnd | ~curr[3] | QUIT), 
 								
 		// ROM
 		.address_imem(instAddr), .q_imem(instData),
@@ -117,17 +120,22 @@ module GuyBox (
 	
 	// Register File
 	regfile RegisterFile(.clock(clk25), 
-		.ctrl_writeEnable(rwe), .ctrl_reset(reset | reset_rf), 
+		.ctrl_writeEnable(rwe), .ctrl_reset(reset | RESET_RF), 
 		.ctrl_writeReg(rd),
 		.ctrl_readRegA(rs1), .ctrl_readRegB(rs2), .ctrl_readRegC(rs3),
 		.data_writeReg(rData), .data_readRegA(regA), .data_readRegB(regB), .data_readRegC(regC));
 						
 	// Processor Memory (RAM)
-	RAM ProcMem(.clk(clk25), 
+	RAM #(		
+		.DEPTH(65536), 
+		.DATA_WIDTH(1),      
+		.ADDRESS_WIDTH(16),     
+		.MEMFILE({DATA_FILE, ".mem"})) 
+	ProcMem(.clk(clk25), 
 		.wEn(mwe), 
-		.addr(memAddr[11:0]), 
-		.dataIn(memDataIn), 
-		.dataOut(memDataOut));
+		.addr(memAddr[15:0]), 
+		.dataIn(memDataIn[0]), 
+		.dataOut(memDataOut[0]));
 	
 
 endmodule
