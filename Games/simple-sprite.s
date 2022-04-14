@@ -55,7 +55,9 @@ GAMEPLAY:
         GAME_DONE:
             addi $bkg, $r0, 19200
             ren bkg, $r0, $r0, $bkg         # render background
-            ren sp1, $r0, $r0, $r0          # render sprite
+            addi $s1_x, $r0, 20
+            addi $s1_y, $r0, 60
+            ren sp1, $s1_x, $s1_y, $r0    # render sprite
             j EXIT
 
 

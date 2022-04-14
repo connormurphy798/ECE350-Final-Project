@@ -78,8 +78,8 @@ module GuyBox (
 					
 
 	// ADD YOUR MEMORY FILE HERE
-	localparam INSTR_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Games/simple-reset";
-	//localparam INSTR_FILE = "./Games/simple-reset";
+	localparam INSTR_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Games/simple-sprite";
+	//localparam INSTR_FILE = "./Games/simple-sprite";
 
 	// Main Processing Unit
 	processor CPU(.clock(clk25), .reset(reset | screenEnd | ~curr[3]), 

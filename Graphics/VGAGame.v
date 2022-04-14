@@ -93,13 +93,13 @@ module VGAGame(
 		.wEn(1'b0)); 						
 	
 	// sprite GMEM
-	wire[8:0] imgAddress_sp1;  	
-	assign imgAddress_sp1 = (x_adj - sp1_x) + 16*(y_adj - sp1_y) + sp1_addr[8:0];
+	wire[7:0] imgAddress_sp1;  	
+	assign imgAddress_sp1 = (x_adj - sp1_x) + 16*(y_adj - sp1_y) + sp1_addr[7:0];
 	wire colorAddr_sp1; 
 	GRAM #(		
-		.DEPTH(256*2), 
+		.DEPTH(256), 
 		.DATA_WIDTH(1),   
-		.ADDRESS_WIDTH(9), 
+		.ADDRESS_WIDTH(8), 
 		.MEMFILE({FILES_PATH, "sp_guy0.mem"}))
 	GMEM_16by16(
 		.clk(clk), 						 
