@@ -205,13 +205,19 @@ MENU:
 
     exit_game:
             addi $state_buff, $r0, 0            # reset state buffer
-            addi $state, $r0, 2                 # keep in pause menu when returning from quit
+            addi $state, $r0, 1                 # go to game when returning from quit
+            nop
+            nop                                 # stall to let state change get through pipeline
+            nop
+            nop
+            nop
             QUITGAME $r0                        # quits game and keeps progress saved
             j MENU_DONE
 
 
     MENU_DONE:
             ren bkg, $r0, $r0, $bkg             # render background
+            ren sp1, $s1_x, $s1_y, $sp1         # render sprite 1 from memory 0
             j EXIT
 
 

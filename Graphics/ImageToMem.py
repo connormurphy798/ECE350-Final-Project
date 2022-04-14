@@ -32,4 +32,4 @@ def convertImage(imgfile, w, h, type=""):
 
 
 if __name__ == "__main__":
-    convertImage("sp_guy0", 16, 16, ".png")
+    convertImage("bkg_boxtest", 160, 480, ".png")

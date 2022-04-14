@@ -79,7 +79,8 @@ module GuyBox (
 		
 
 	
-	localparam INSTR_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Games/simple-sprite";
+	localparam INSTR_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Games/box-test";
+	//localparam DATA_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Graphics/MemFiles/bkg_boxtest";
 	//localparam INSTR_FILE = "./Games/simple-sprite";
 
 	// Main Processing Unit
