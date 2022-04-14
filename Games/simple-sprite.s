@@ -21,6 +21,10 @@ beq $state, $r2, MENU
           #OPENING SCREEN FOR GAME
 OPENING:
         bbp 7, start_OPEN
+
+        addi $s1_x, $r0, 20                         # initialize sp1 starting coords
+        addi $s1_y, $r0, 60
+        
         bne $r19, $r0, change_to_game
         j OPEN_DONE
 
@@ -44,6 +48,20 @@ OPENING:
           #DIRECTIONAL BUTTONS CONTROL SPRITE MOVEMENT
 GAMEPLAY:
         bbp 7, start_GAME
+
+        sbp $r4, 0                          # check UP
+        sub $s1_y, $s1_y, $r4
+
+        sbp $r4, 1                          # check DOWN
+        add $s1_y, $s1_y, $r4
+
+        sbp $r5, 2                          # check LEFT
+        sub $s1_x, $s1_x, $r5
+
+        sbp $r5, 3                          # check RIGHT
+        add $s1_x, $s1_x, $r5
+
+
         j GAME_DONE
 
         start_GAME:                         # on START press
@@ -55,9 +73,8 @@ GAMEPLAY:
         GAME_DONE:
             addi $bkg, $r0, 19200
             ren bkg, $r0, $r0, $bkg         # render background
-            addi $s1_x, $r0, 20
-            addi $s1_y, $r0, 60
-            ren sp1, $s1_x, $s1_y, $r0    # render sprite
+            
+            ren sp1, $s1_x, $s1_y, $r0      # render sprite
             j EXIT
 
 
