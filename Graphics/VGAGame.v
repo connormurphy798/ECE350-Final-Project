@@ -93,7 +93,7 @@ module VGAGame(
 		.DEPTH(PIXEL_COUNT*NUM_PICS), 
 		.DATA_WIDTH(1),      
 		.ADDRESS_WIDTH(PIXEL_ADDRESS_WIDTH),     
-		.MEMFILE({FILES_PATH, "bkg_boxtest.mem"}))
+		.MEMFILE({FILES_PATH, "bkg_maze_gmem.mem"}))
 	GMEM_160by120(
 		.clk(clk), 						
 		.addr(imgAddress_bkg),			
@@ -102,15 +102,15 @@ module VGAGame(
 	
 
 	// sprite 1 GMEM
-	wire[7:0] imgAddress_sp1;  	
-	assign imgAddress_sp1 = (x_adj - sp1_x) + 16*(y_adj - sp1_y) + sp1_addr[7:0];
+	wire[5:0] imgAddress_sp1;  	
+	assign imgAddress_sp1 = (x_adj - sp1_x) + ((y_adj - sp1_y) * 8) + sp1_addr[5:0];
 	wire colorAddr_sp1; 
 	GRAM #(		
-		.DEPTH(256), 
+		.DEPTH(64), 
 		.DATA_WIDTH(1),   
-		.ADDRESS_WIDTH(8), 
-		.MEMFILE({FILES_PATH, "sp_guy0.mem"}))
-	GMEM_16by16(
+		.ADDRESS_WIDTH(6), 
+		.MEMFILE({FILES_PATH, "sp_guy1.mem"}))
+	GMEM_8by8(
 		.clk(clk), 						 
 		.addr(imgAddress_sp1),
 		.dataOut(colorAddr_sp1),	
@@ -118,7 +118,7 @@ module VGAGame(
 	
 	// draw sprite 1
 	wire [7:0] sp1_l = sp1_x;		wire [6:0] sp1_t = sp1_y;
-	wire [7:0] sp1_r = sp1_x + 16;	wire [6:0] sp1_b = sp1_y + 16;
+	wire [7:0] sp1_r = sp1_x + 8;	wire [6:0] sp1_b = sp1_y + 8;
 	reg in_sp1;	
 	always @(posedge clk25) begin
 		in_sp1	<=	x_adj >= sp1_l &
@@ -128,17 +128,17 @@ module VGAGame(
 	end
 
 
-
+    
     // sprite 2 GMEM
-	wire[5:0] imgAddress_sp2;  	
-	assign imgAddress_sp2 = (x_adj - sp2_x) + 8*(y_adj - sp2_y) + sp2_addr[5:0];
+	wire[7:0] imgAddress_sp2;  	
+	assign imgAddress_sp2 = (x_adj - sp2_x) + 16*(y_adj - sp2_y) + sp2_addr[7:0];
 	wire colorAddr_sp2; 
 	GRAM #(		
-		.DEPTH(64), 
+		.DEPTH(256), 
 		.DATA_WIDTH(1),   
-		.ADDRESS_WIDTH(6), 
-		.MEMFILE({FILES_PATH, "sp_guy1.mem"}))
-	GMEM_8by8(
+		.ADDRESS_WIDTH(8), 
+		.MEMFILE({FILES_PATH, "sp_guy0.mem"}))
+	GMEM_16by16(
 		.clk(clk), 						 
 		.addr(imgAddress_sp2),
 		.dataOut(colorAddr_sp2),	
@@ -146,18 +146,18 @@ module VGAGame(
 	
 	// draw sprite 2
 	wire [7:0] sp2_l = sp2_x;		wire [6:0] sp2_t = sp2_y;
-	wire [7:0] sp2_r = sp2_x + 8;	wire [6:0] sp2_b = sp2_y + 8;
-	reg in_sp2;	
+	wire [7:0] sp2_r = sp2_x + 16;	wire [6:0] sp2_b = sp2_y + 16;
+	reg in_sp2 = 0;/*	
 	always @(posedge clk25) begin
 		in_sp2	<=	x_adj >= sp2_l &
 					x_adj <  sp2_r &
 					y_adj >= sp2_t &
 					y_adj <  sp2_b;
-	end
+	end*/
 
 	
 	// color data
-    assign spriteData = sp2_en ? colorAddr_sp2 : colorAddr_sp1;
+    assign spriteData = colorAddr_sp1; //sp1_en ? colorAddr_sp1 : colorAddr_sp2;
 
 	assign colorData = in_sp1 & sp1_en | in_sp2 & sp2_en ? spriteData : colorAddr_bkg;
     

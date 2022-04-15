@@ -66,12 +66,29 @@ def invertMem(memfile, w, h, inPlace=False):
         mem.close()
 
 
-# TODO: write function to combine multiple existing .mem files
+def combineMem(newfile, memfiles):
+    """
+    combines a list of memfiles into a single newfile
+    """
+    newmem = open("Graphics/MemFiles/" + newfile + ".mem", "w")
+    for filename in memfiles:
+        file = open("Graphics/MemFiles/" + filename + ".mem", "r")
+        for line in file:
+            newmem.write(line)
+        file.close()
+    newmem.close()
 
 
 
 if __name__ == "__main__":
     pass
-    convertImage("sp_guy1", 8, 8, ".png")
+    # convertImage("bkg_maze_MAZE1", 160, 120, ".png")
+    # convertImage("bkg_maze_QUIT", 160, 120, ".png")
+    # convertImage("bkg_maze_RETURN", 160, 120, ".png")
+    # convertImage("bkg_maze_TITLE", 160, 120, ".png")
     # invertMem("", 160, 120, inPlace=True)
+    combineMem("bkg_maze_gmem", [   "bkg_maze_TITLE",
+                                    "bkg_maze_RETURN",
+                                    "bkg_maze_QUIT",
+                                    "bkg_maze_MAZE1"    ])
 
