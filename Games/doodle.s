@@ -1,6 +1,6 @@
 #
-# simple maze game with collision on walls
-#
+# doodle-jump-like vertical platformer
+3
 # pipeline and PC latches reset on frame change
 # state register holds main menu, gameplay, or game menu
 #       each has a separate loop
@@ -12,7 +12,7 @@
 # 0 = opening screen
 # 19200 = pause, resume selected
 # 38400 = pause, exit selected
-# 57600 = maze background
+# 57600 = start of background
 ##################################################################################################################
 
 addi $r1, $r0, 1                                    # for state 1 comparison
@@ -61,74 +61,7 @@ GAMEPLAY:
     addi $s1_xbuff, $s1_x, 0                    # initialize xbuff to x
     addi $s1_ybuff, $s1_y, 0                    # initialize ybuff to y
 
-    bbp 7, start_GAME
-    bne $state_buff, $r0, change_to_menu
-    bbp 0, up_GAME
-    bbp 1, down_GAME
-    bbp 2, left_GAME
-    bbp 3, right_GAME
-
-    j GAMEPLAY_DONE
-
-    start_GAME:                                 # on START press
-            addi $state_buff, $r0, 1            # put 1 into state buffer
-            j GAMEPLAY_DONE
-
-    up_GAME:                                    # on UP press
-            addi $s1_ybuff, $s1_y, -1           # add -1 to y coordinate of sprite 1
-            #addi $s1_xbuff, $s1_x, 0           # keep x the same
-            bbp 2, left_GAME
-            bbp 3, right_GAME
-            j process_move
-
-    down_GAME:                                  # on DOWN press
-            addi $s1_ybuff, $s1_y, 1            # add 1 to y coordinate of sprite 1
-            #addi $s1_xbuff, $s1_x, 0           # keep x the same
-            bbp 2, left_GAME
-            bbp 3, right_GAME
-            j process_move
-
-    left_GAME:                                  # on LEFT press
-            addi $s1_xbuff, $s1_x, -1           # add -1 to x coordinate of sprite 1
-            #addi $s1_ybuff, $s1_y, 0           # keep y the same
-            j process_move
-
-    right_GAME:                                 # on RIGHT press
-            addi $s1_xbuff, $s1_x, 1            # add 1 to x coordinate of sprite 1
-            #addi $s1_ybuff, $s1_y, 0           # keep y the same
-            j process_move
-
-
-    process_move:
-            addi $r1, $r0, 160                  # $r1 = screen width
-            addi $r2, $s1_xbuff, 8              # $r2 = xbuff + 8     right edge of sprite
-            addi $r3, $s1_ybuff, 8              # $r3 = ybuff + 8     bottom edge of sprite
-
-            mul $r4, $s1_ybuff, $r1             # $r4 = ybuff * screenwidth
-            addi $r5, $r4, 1280                 # $r5 = (ybuff + 8) * screenwidth  =  (ybuff * screenwidth) + (8 * screenwidth)
-
-            #top left
-            add $r6, $s1_xbuff, $r4             # $r6 = xbuff + (ybuff * screenwidth) = addr to check
-            lw $r6, 0($r6)                      # $r6 = MEM[addr] = background at top left corner of sprite
-            #top right
-            add $r7, $r2, $r4                   # $r7 = (xbuff + 16) + (ybuff * screenwidth) = addr to check
-            lw $r7, 0($r7)                      # $r7 = MEM[addr] = background at top right of sprite
-            #bottom left
-            add $r8, $s1_xbuff, $r5             # $r8 = xbuff + ((ybuff + 16) * screenwidth) = addr to check
-            lw $r8, 0($r8)                      # $r8 = MEM[addr] = background at bottom left of sprite
-            #bottom right
-            add $r9, $r2, $r5                   # $r9 = (xbuff + 16) + ((ybuff + 16) * screenwidth) = addr to check
-            lw $r9, 0($r9)                      # $r9 = MEM[addr] = background at bottom right of sprite
-
-
-            bne $r6, $r0, GAMEPLAY_DONE         # checking corners ... if hitting wall don't update position
-            bne $r7, $r0, GAMEPLAY_DONE         # |
-            bne $r8, $r0, GAMEPLAY_DONE         # |
-            bne $r9, $r0, GAMEPLAY_DONE         # |
-            
-            addi $s1_x, $s1_xbuff, 0            # replace x coord with xbuff
-            addi $s1_y, $s1_ybuff, 0            # replace y coord with ybuff
-            j GAMEPLAY_DONE
+    
 
 
     change_to_menu:
