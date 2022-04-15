@@ -74,6 +74,11 @@ module VGAGraphics(
     wire [7:0] x_coord_SP1;
     wire [6:0] y_coord_SP1;
 
+    wire draw_SP2;
+    wire [31:0] addr_gmem_SP2;
+    wire [7:0] x_coord_SP2;
+    wire [6:0] y_coord_SP2;
+
     ProcVGAInterface procvga(.sysclk(clk25), .frclk(screenEnd),
                             .gmem_en(gmem_en),
                             .addr_gmem_IN(addr_gmem_IN),
@@ -84,7 +89,10 @@ module VGAGraphics(
                             .x_coord_BKG(x_coord_BKG), .y_coord_BKG(y_coord_BKG),
 
                             .draw_SP1(draw_SP1), .addr_gmem_SP1(addr_gmem_SP1),
-                            .x_coord_SP1(x_coord_SP1), .y_coord_SP1(y_coord_SP1)
+                            .x_coord_SP1(x_coord_SP1), .y_coord_SP1(y_coord_SP1),
+
+                            .draw_SP2(draw_SP2), .addr_gmem_SP2(addr_gmem_SP2),
+                            .x_coord_SP2(x_coord_SP2), .y_coord_SP2(y_coord_SP2)
     );
 
 
@@ -144,7 +152,8 @@ module VGAGraphics(
                     .buttons(buttons),
                     .screenEnd(screenEnd100),
                     .bkg_en(draw_BKG), .bkg_addr(addr_gmem_BKG), .bkg_x(x_coord_BKG), .bkg_y(y_coord_BKG),
-                    .sp1_en(draw_SP1), .sp1_addr(addr_gmem_SP1), .sp1_x(x_coord_SP1), .sp1_y(y_coord_SP1) 
+                    .sp1_en(draw_SP1), .sp1_addr(addr_gmem_SP1), .sp1_x(x_coord_SP1), .sp1_y(y_coord_SP1),
+                    .sp2_en(draw_SP2), .sp2_addr(addr_gmem_SP2), .sp2_x(x_coord_SP2), .sp2_y(y_coord_SP2)  
                     );
 
     

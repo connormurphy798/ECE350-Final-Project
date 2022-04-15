@@ -13,15 +13,20 @@ module ProcVGAInterface(
     input [6:0] y_coord_IN,
     input [1:0] imgcode_IN,
 
-    output draw_BKG,                    // TODO: augment with sprite logic
+    output draw_BKG,                    
     output [31:0] addr_gmem_BKG,
     output [7:0] x_coord_BKG,
     output [6:0] y_coord_BKG,
 
-    output draw_SP1,                    // TODO: augment with sprite logic
+    output draw_SP1,                   
     output [31:0] addr_gmem_SP1,
     output [7:0] x_coord_SP1,
-    output [6:0] y_coord_SP1
+    output [6:0] y_coord_SP1,
+
+    output draw_SP2,                   
+    output [31:0] addr_gmem_SP2,
+    output [7:0] x_coord_SP2,
+    output [6:0] y_coord_SP2
     );
 
 
@@ -60,6 +65,25 @@ module ProcVGAInterface(
     // clocked on frame clock
     IM_reg sp1F(addr_gmem_SP1,  x_coord_SP1,    y_coord_SP1,    draw_SP1,
                 addr_gmem01,    x_coord01,      y_coord01,      draw01,
+                frclk, 1'b1, 1'b0);
+
+    
+
+    // --------------------------------- SP2 ---------------------------------------
+
+    wire draw10;              
+    wire [31:0] addr_gmem10;
+    wire [7:0] x_coord10;
+    wire [6:0] y_coord10;
+
+    // clocked on system clock
+    IM_reg sp2S(addr_gmem10,    x_coord10,  y_coord10,  draw10,
+                addr_gmem_IN,   x_coord_IN, y_coord_IN, (imgcode_IN == 2'b10 & gmem_en),
+                sysclk, (imgcode_IN == 2'b10 & gmem_en), 1'b0);
+    
+    // clocked on frame clock
+    IM_reg sp2F(addr_gmem_SP2,  x_coord_SP2,    y_coord_SP2,    draw_SP2,
+                addr_gmem10,    x_coord10,      y_coord10,      draw10,
                 frclk, 1'b1, 1'b0);
 
 

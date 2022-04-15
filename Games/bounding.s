@@ -1,7 +1,15 @@
 
 # current position
-    addi    $r10, $r10, 256         # $r10 = w
-    mul     $r9, $s1_y, $r10        # $r9 = y*w
+    addi    $r10, $r0, 160         # $r10 = w
+    nop
+    nop
+    nop
+    nop
+    mul     $r9, $r10, $s1_y        # $r9 = y*w
+    nop
+    nop
+    nop
+    nop
     add     $r9, $r9, $s1_x         # $r9 = y*w + x (DMEM address of current top left)
 
 # -------------- get button presses --------------
@@ -32,7 +40,7 @@ DOWN:
     nop
     beq     $r2, $r0, LEFT          # branch if DOWN not pressed
 
-    addi    $r8, $r9, 160           # CURRENT_POS + 160
+    addi    $r8, $r9, 160          # CURRENT_POS + 16*160 + 160
     lw      $rtest1, 0($r8) 
     # addi    $rtest1, $r0, 1             
     nop
@@ -68,7 +76,7 @@ RIGHT:
     nop
     beq     $r4, $r0, RENDER        # branch if RIGHT not pressed
 
-    addi    $r8, $r9, 1             # CURRENT_POS + 1
+    addi    $r8, $r9, 17            # CURRENT_POS + 16 + 1
     lw      $rtest1, 0($r8)  
     # addi    $rtest1, $r0, 1            
     nop
@@ -85,5 +93,9 @@ RENDER:
 
 
 EXIT:
+    nop
+    nop
+    nop
+    nop
     j EXIT
 

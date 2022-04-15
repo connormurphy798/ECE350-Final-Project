@@ -72,13 +72,6 @@ def invertMem(memfile, w, h, inPlace=False):
 
 if __name__ == "__main__":
     pass
-    # convertImage("bkg_box3", 160, 120, ".png")
-    # invertMem("bkg_boxtest", 160, 480, inPlace=True)
-    # invertMem("bkg_colors", 160, 120, inPlace=True)
-    # invertMem("bkg_controller", 160, 120, inPlace=True)
-    # invertMem("bkg_gmemtest", 160, 240, inPlace=True)
-    # invertMem("bkg_homescreen", 160, 120, inPlace=True)
-    # invertMem("bkg_patterntest", 160, 120, inPlace=True)
-    # invertMem("bkg_patterntest2", 160, 240, inPlace=True)
-    # invertMem("bkg_welcome", 160, 120, inPlace=True)
-    invertMem("bkg_stripes", 160, 120, inPlace=True)
+    convertImage("sp_guy1", 8, 8, ".png")
+    # invertMem("", 160, 120, inPlace=True)
+

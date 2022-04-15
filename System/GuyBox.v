@@ -92,8 +92,8 @@ module GuyBox (
     // testing
     wire [31:0] M_instr;    
 	
-	localparam INSTR_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Games/bounding";
-	localparam DATA_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Graphics/MemFiles/bkg_stripes";
+	localparam INSTR_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Games/maze";
+	localparam DATA_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Graphics/MemFiles/bkg_boxtest_dmem";
 	//localparam INSTR_FILE = "./Games/simple-sprite";
 
 	// Main Processing Unit
