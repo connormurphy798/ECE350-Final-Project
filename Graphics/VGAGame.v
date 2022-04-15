@@ -69,7 +69,8 @@ module VGAGame(
 	// Image Data to Map Pixel Location to Color Address
 	localparam 
 		PIXEL_COUNT = (VIDEO_WIDTH >> 2)*(VIDEO_HEIGHT >> 2),    // Number of pixels on the screen
-		PIXEL_ADDRESS_WIDTH = $clog2(PIXEL_COUNT) + 4,           // Use built in log2 command
+        NUM_PICS = 1,
+		PIXEL_ADDRESS_WIDTH = $clog2(PIXEL_COUNT) + NUM_PICS,    // Use built in log2 command
 		BITS_PER_COLOR = 12, 	  								 // Nexys A7 uses 12 bits/color
 		PALETTE_COLOR_COUNT = 2, 								 // Number of Colors available
 		PALETTE_ADDRESS_WIDTH = $clog2(PALETTE_COLOR_COUNT) + 1; // Use built in log2 Command
@@ -82,10 +83,10 @@ module VGAGame(
 	assign imgAddress_bkg = x_adj + 160*y_adj + bkg_offset[PIXEL_ADDRESS_WIDTH-1:0];
 	wire colorAddr_bkg; 							
 	GRAM #(		
-		.DEPTH(PIXEL_COUNT*4), 
+		.DEPTH(PIXEL_COUNT*NUM_PICS), 
 		.DATA_WIDTH(1),      
 		.ADDRESS_WIDTH(PIXEL_ADDRESS_WIDTH),     
-		.MEMFILE({FILES_PATH, "bkg_boxtest.mem"}))
+		.MEMFILE({FILES_PATH, "bkg_stripes.mem"}))
 	GMEM_160by120(
 		.clk(clk), 						
 		.addr(imgAddress_bkg),			

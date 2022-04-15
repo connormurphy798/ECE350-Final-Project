@@ -41,7 +41,10 @@ module processor(
 
     // Game State
     quit,                           // O: Signal to quit to welcome screen
-    reset_rf                        // O: Signal to reset regfile on quit
+    reset_rf/*,                        // O: Signal to reset regfile on quit
+
+    // testing
+    M_instruction*/
 	 
 	);
 
@@ -76,6 +79,9 @@ module processor(
     // Game State
     output quit;
     output reset_rf;
+    /*
+    // testing
+    output [31:0] M_instruction;*/
 
 
 
@@ -296,6 +302,9 @@ module processor(
     // insert setx on exception
     assign INSTR_into_MW = EXCEPTION ? {5'b10101, excpt_val[26:0]} : INSTR_XM;
     assign VALUE_into_MW = EXCEPTION ? excpt_val : ALUout_XM;
+
+    // testing
+    assign M_instruction = INSTR_XM;
 
 
     // --------------------------------------------------------------------------------------------------------------------------

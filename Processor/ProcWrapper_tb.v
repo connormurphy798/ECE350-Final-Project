@@ -23,7 +23,8 @@ module ProcWrapper_tb #(parameter FILE = "nop");
 	wire[4:0] rd, rs1, rs2, rs3;
 	wire[31:0] instAddr, instData, 
 		rData, regA, regB, regC,
-		memAddr, memDataIn, memDataOut;
+		memAddr, memDataIn;
+	wire memDataOut;
 	wire[7:0] buttons;
 
 	// Wires for Test Harness
@@ -66,7 +67,7 @@ module ProcWrapper_tb #(parameter FILE = "nop");
 									
 		// RAM
 		.wren(mwe), .address_dmem(memAddr), 
-		.data(memDataIn), .q_dmem(memDataOut),
+		.data(memDataIn), .q_dmem({31'b0, memDataOut}),
 		
 		// Controller
 		.controller(buttons)); 
@@ -85,10 +86,15 @@ module ProcWrapper_tb #(parameter FILE = "nop");
 		.data_writeReg(rData), .data_readRegA(regA), .data_readRegB(regB), .data_readRegC(regC));
 						
 	// Processor Memory (RAM)
-	RAM ProcMem(.clk(clock), 
+	RAM #(
+		.DATA_WIDTH(1),	
+		.ADDRESS_WIDTH(16), 
+		.DEPTH(19200),           
+		.MEMFILE("Graphics/MemFiles/bkg_stripes.mem")) 
+	ProcMem(.clk(clock), 
 		.wEn(mwe), 
-		.addr(memAddr[11:0]), 
-		.dataIn(memDataIn), 
+		.addr(memAddr[15:0]), 
+		.dataIn(memDataIn[0]), 
 		.dataOut(memDataOut));
 
 	// for testing purposes, assign the buttons to a constant

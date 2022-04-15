@@ -72,7 +72,7 @@ def invertMem(memfile, w, h, inPlace=False):
 
 if __name__ == "__main__":
     pass
-    # convertImage("bkg_boxtest", 160, 480, ".png")
+    # convertImage("bkg_box3", 160, 120, ".png")
     # invertMem("bkg_boxtest", 160, 480, inPlace=True)
     # invertMem("bkg_colors", 160, 120, inPlace=True)
     # invertMem("bkg_controller", 160, 120, inPlace=True)
@@ -81,3 +81,4 @@ if __name__ == "__main__":
     # invertMem("bkg_patterntest", 160, 120, inPlace=True)
     # invertMem("bkg_patterntest2", 160, 240, inPlace=True)
     # invertMem("bkg_welcome", 160, 120, inPlace=True)
+    invertMem("bkg_stripes", 160, 120, inPlace=True)

@@ -6,7 +6,7 @@ module RAM #( parameter DATA_WIDTH = 32, ADDRESS_WIDTH = 12, DEPTH = 4096, MEMFI
     input wire [DATA_WIDTH-1:0]    dataIn,
     output reg [DATA_WIDTH-1:0]    dataOut);
     
-    reg[DATA_WIDTH-1:0] MemoryArray[0:DEPTH-1];
+    reg MemoryArray[0:DEPTH-1];
     
     integer i;
     initial begin
@@ -16,7 +16,7 @@ module RAM #( parameter DATA_WIDTH = 32, ADDRESS_WIDTH = 12, DEPTH = 4096, MEMFI
         end
         */
         if(MEMFILE > 0) begin
-            $readmemb(MEMFILE, MemoryArray, 57600);
+            $readmemb(MEMFILE, MemoryArray);
         end
     end
     

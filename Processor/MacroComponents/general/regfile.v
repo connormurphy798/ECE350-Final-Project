@@ -2,7 +2,8 @@ module regfile (
 	clock,
 	ctrl_writeEnable, ctrl_reset, ctrl_writeReg,
 	ctrl_readRegA, ctrl_readRegB, ctrl_readRegC, data_writeReg,
-	data_readRegA, data_readRegB, data_readRegC
+	data_readRegA, data_readRegB, data_readRegC,
+    data_rtest1, data_rtest2
 );
 
 	input clock, ctrl_writeEnable, ctrl_reset;
@@ -10,6 +11,7 @@ module regfile (
 	input [31:0] data_writeReg;
 
 	output [31:0] data_readRegA, data_readRegB, data_readRegC;
+    output data_rtest1, data_rtest2;
 
 
 	// decode readRegA, readRegB, readRegC, and writeReg inputs
@@ -182,6 +184,12 @@ module regfile (
 	tristate32 q29triC(data_readRegC, q29, readR_C[29]);
 	tristate32 q30triC(data_readRegC, q30, readR_C[30]);
 	tristate32 q31triC(data_readRegC, q31, readR_C[31]);
+
+
+
+    // test registers: always read the first bit of $r17 + $r18
+    assign data_rtest1 = q17[0];
+    assign data_rtest2 = q18[0];
 
 
 endmodule

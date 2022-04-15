@@ -26,10 +26,16 @@ module GuyBox (
 	output[3:0] VGA_R,
 	output[3:0] VGA_G,
 	output[3:0] VGA_B,
-
+	
     // state info
     output[7:0] buttons,
     output[3:0] curr
+    /*
+    // testing
+    output rtest1,
+    output rtest2,
+    output RAM_val   // 
+    */
     );
 
 
@@ -55,9 +61,11 @@ module GuyBox (
 	wire[4:0] rd, rs1, rs2, rs3;
 	wire[31:0] instAddr, instData, 
 		rData, regA, regB, regC,
-		memAddr, memDataIn, memDataOut;
+		memAddr, memDataIn;
+    wire memDataOut;
 	wire quit, reset_rf, QUIT, RESET_RF;
 
+    wire screenEnd;
 	dffe_ref dffQUIT(QUIT, quit, screenEnd, 1'b1, 1'b0);
 	dffe_ref dffRSRF(RESET_RF, reset_rf, screenEnd, 1'b1, 1'b0);
 
@@ -71,8 +79,8 @@ module GuyBox (
     wire [31:0] x_coord;
     wire [31:0] y_coord;
     wire [11:0] sprite;
-    wire gmem_en, screenEnd;
-	VGAGraphics vga(.clk(clk), .clk25(clk25), .reset(reset | QUIT),
+    wire gmem_en;
+	VGAGraphics vga(.clk(clk), .clk25(clk25), .reset(reset /*| QUIT*/),
 					.hSync(hSync), .vSync(vSync),
 					.VGA_R(VGA_R), .VGA_G(VGA_G), .VGA_B(VGA_B),
 					.curr(curr), .screenEnd(screenEnd), .buttons(buttons),
@@ -80,14 +88,16 @@ module GuyBox (
 					.x_coord_IN(x_coord[7:0]), .y_coord_IN(y_coord[6:0]),
 					.imgcode_IN(sprite[1:0]));
 		
-
+		
+    // testing
+    wire [31:0] M_instr;    
 	
-	localparam INSTR_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Games/box-test";
-	localparam DATA_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Graphics/MemFiles/bkg_boxtest";
+	localparam INSTR_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Games/bounding";
+	localparam DATA_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Graphics/MemFiles/bkg_stripes";
 	//localparam INSTR_FILE = "./Games/simple-sprite";
 
 	// Main Processing Unit
-	processor CPU(.clock(clk25), .reset(reset | screenEnd | ~curr[3]), 
+	processor CPU(.clock(clk25), .reset(reset | screenEnd | ~curr[3]/* | QUIT*/), 
 								
 		// ROM
 		.address_imem(instAddr), .q_imem(instData),
@@ -99,7 +109,7 @@ module GuyBox (
 									
 		// RAM
 		.wren(mwe), .address_dmem(memAddr), 
-		.data(memDataIn), .q_dmem(memDataOut),
+		.data(memDataIn), .q_dmem({31'b0, memDataOut}),
 		
 		// Controller
 		.controller(buttons),
@@ -108,7 +118,10 @@ module GuyBox (
         .address_gmem(address_gmem), .x_coord(x_coord), .y_coord(y_coord), .sprite(sprite), .gmem_en(gmem_en),
 
 		// Quit Game
-		.quit(quit), .reset_rf(reset_rf)
+		.quit(quit), .reset_rf(reset_rf)/*,
+
+        // testing
+        .M_instruction(M_instr)*/
     
     ); 
 	
@@ -120,22 +133,24 @@ module GuyBox (
 	
 	// Register File
 	regfile RegisterFile(.clock(clk25), 
-		.ctrl_writeEnable(rwe), .ctrl_reset(reset | RESET_RF), 
+		.ctrl_writeEnable(rwe), .ctrl_reset(reset/* | RESET_RF*/), 
 		.ctrl_writeReg(rd),
 		.ctrl_readRegA(rs1), .ctrl_readRegB(rs2), .ctrl_readRegC(rs3),
-		.data_writeReg(rData), .data_readRegA(regA), .data_readRegB(regB), .data_readRegC(regC));
+		.data_writeReg(rData), .data_readRegA(regA), .data_readRegB(regB), .data_readRegC(regC),
+        .data_rtest1(rtest1), .data_rtest2(rtest2));
 						
 	// Processor Memory (RAM)
 	RAM #(		
-		.DEPTH(65536), 
+		.DEPTH(19200), 
 		.DATA_WIDTH(1),      
-		.ADDRESS_WIDTH(16),     
+		.ADDRESS_WIDTH(14),     
 		.MEMFILE({DATA_FILE, ".mem"})) 
 	ProcMem(.clk(clk25), 
 		.wEn(mwe), 
-		.addr(memAddr[15:0]), 
+		.addr(memAddr[13:0]), 
 		.dataIn(memDataIn[0]), 
-		.dataOut(memDataOut[0]));
+		.dataOut(memDataOut));
 	
+    assign RAM_val = memDataOut;
 
 endmodule
