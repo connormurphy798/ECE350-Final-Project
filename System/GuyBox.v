@@ -97,7 +97,7 @@ module GuyBox (
 	//localparam INSTR_FILE = "./Games/simple-sprite";
 
 	// Main Processing Unit
-	processor CPU(.clock(clk25), .reset(reset | screenEnd | ~curr[3]), 
+	processor CPU(.clock(clk125), .reset(reset | screenEnd | ~curr[3]), 
 								
 		// ROM
 		.address_imem(instAddr), .q_imem(instData),
@@ -127,12 +127,12 @@ module GuyBox (
 	
 	// Instruction Memory (ROM)
 	ROM #(.MEMFILE({INSTR_FILE, ".mem"}))
-	InstMem(.clk(clk25), 
+	InstMem(.clk(clk125), 
 		.addr(instAddr[11:0]), 
 		.dataOut(instData));
 	
 	// Register File
-	regfile RegisterFile(.clock(clk25), 
+	regfile RegisterFile(.clock(clk125), 
 		.ctrl_writeEnable(rwe), .ctrl_reset(reset | RESET_RF), 
 		.ctrl_writeReg(rd),
 		.ctrl_readRegA(rs1), .ctrl_readRegB(rs2), .ctrl_readRegC(rs3),
@@ -145,7 +145,7 @@ module GuyBox (
 		.DATA_WIDTH(1),      
 		.ADDRESS_WIDTH(15),     
 		.MEMFILE({DATA_FILE, ".mem"})) 
-	ProcMem(.clk(clk25), 
+	ProcMem(.clk(clk125), 
 		.wEn(mwe), 
 		.addr(memAddr[14:0]), 
 		.dataIn(memDataIn[0]), 
