@@ -66,8 +66,8 @@ module GuyBox (
 	wire quit, reset_rf, QUIT, RESET_RF;
 
     wire screenEnd;
-	dffe_ref dffQUIT(QUIT, quit, screenEnd, 1'b1, 1'b0);
-	dffe_ref dffRSRF(RESET_RF, reset_rf, screenEnd, 1'b1, 1'b0);
+	dffe_ref dffQUIT(QUIT, quit, clk25, 1'b1, 1'b0);
+	dffe_ref dffRSRF(RESET_RF, reset_rf, clk25, 1'b1, 1'b0);
 
 
     // Sega Genesis controller interface
@@ -80,7 +80,7 @@ module GuyBox (
     wire [31:0] y_coord;
     wire [11:0] sprite;
     wire gmem_en;
-	VGAGraphics vga(.clk(clk), .clk25(clk25), .reset(reset /*| QUIT*/),
+	VGAGraphics vga(.clk(clk), .clk25(clk25), .reset(reset | QUIT),
 					.hSync(hSync), .vSync(vSync),
 					.VGA_R(VGA_R), .VGA_G(VGA_G), .VGA_B(VGA_B),
 					.curr(curr), .screenEnd(screenEnd), .buttons(buttons),
@@ -97,7 +97,7 @@ module GuyBox (
 	//localparam INSTR_FILE = "./Games/simple-sprite";
 
 	// Main Processing Unit
-	processor CPU(.clock(clk25), .reset(reset | screenEnd | ~curr[3]/* | QUIT*/), 
+	processor CPU(.clock(clk25), .reset(reset | screenEnd | ~curr[3]), 
 								
 		// ROM
 		.address_imem(instAddr), .q_imem(instData),
@@ -133,7 +133,7 @@ module GuyBox (
 	
 	// Register File
 	regfile RegisterFile(.clock(clk25), 
-		.ctrl_writeEnable(rwe), .ctrl_reset(reset/* | RESET_RF*/), 
+		.ctrl_writeEnable(rwe), .ctrl_reset(reset | RESET_RF), 
 		.ctrl_writeReg(rd),
 		.ctrl_readRegA(rs1), .ctrl_readRegB(rs2), .ctrl_readRegC(rs3),
 		.data_writeReg(rData), .data_readRegA(regA), .data_readRegB(regB), .data_readRegC(regC),
