@@ -45,7 +45,7 @@ OPENING:
         addi $sp1, $r0, 0                       # render sprite at memory 0 next
 
         ######## INITIALIZE SPRITE POSITION ########
-        addi $s1_x, $r0, 3
+        addi $s1_x, $r0, 4
         addi $s1_y, $r0, 7
 
         j EXIT

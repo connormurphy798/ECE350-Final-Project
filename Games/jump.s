@@ -7,6 +7,12 @@
 #
 ##################################################################################################################
 
+
+#TESTESTESTESTESTESTESTESTESTESTESTESTESTESTEST
+#ren sp1, $s2_x, $s2_y, $sp2
+#ren bkg, $r0, $r0, $bkg
+#TESTESTESTESTESTESTESTESTESTESTESTESTESTESTEST
+
 addi $r1, $r0, 1
 addi $r3, $r0, 3
 addi $r4, $r0, 4
@@ -21,7 +27,7 @@ beq $state, $r3, GROUNDED
 FALLING:
     bbp 2, left_FALL
     bbp 3, right_FALL
-    addi $s2_ybuff, $s2_y, 160                              # try to move sprite down by 1 first
+    addi $s2_ybuff, $s2_y, 1                                # try to move sprite down by 1 first
     j process_fall
 
     left_FALL:
@@ -70,7 +76,7 @@ FALLING:
 
 
     FALL_DONE:
-            ren s2, $s2_x, $s2_y, $sp2
+            ren sp1, $s2_x, $s2_y, $sp2
             ren bkg, $r0, $r0, $bkg
             j EXIT
 
@@ -115,7 +121,7 @@ GROUNDED:
             j GROUND_DONE
 
     GROUND_DONE:
-            ren s2, $s2_x, $s2_y, $sp2
+            ren sp1, $s2_x, $s2_y, $sp2
             ren bkg, $r0, $r0, $bkg
             j EXIT
 

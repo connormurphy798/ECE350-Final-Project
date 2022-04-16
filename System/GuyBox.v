@@ -143,11 +143,11 @@ module GuyBox (
 	RAM #(		
 		.DEPTH(19200), 
 		.DATA_WIDTH(1),      
-		.ADDRESS_WIDTH(14),     
+		.ADDRESS_WIDTH(15),     
 		.MEMFILE({DATA_FILE, ".mem"})) 
 	ProcMem(.clk(clk25), 
 		.wEn(mwe), 
-		.addr(memAddr[13:0]), 
+		.addr(memAddr[14:0]), 
 		.dataIn(memDataIn[0]), 
 		.dataOut(memDataOut));
 	

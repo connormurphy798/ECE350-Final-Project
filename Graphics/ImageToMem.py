@@ -83,12 +83,10 @@ def combineMem(newfile, memfiles):
 if __name__ == "__main__":
     pass
     # convertImage("bkg_maze_MAZE1", 160, 120, ".png")
-    # convertImage("bkg_maze_QUIT", 160, 120, ".png")
-    # convertImage("bkg_maze_RETURN", 160, 120, ".png")
-    # convertImage("bkg_maze_TITLE", 160, 120, ".png")
     # invertMem("", 160, 120, inPlace=True)
-    combineMem("bkg_maze_gmem", [   "bkg_maze_TITLE",
-                                    "bkg_maze_RETURN",
-                                    "bkg_maze_QUIT",
-                                    "bkg_maze_MAZE1"    ])
+    # combineMem("bkg_maze_gmem", [   "bkg_maze_TITLE",
+    #                                 "bkg_maze_RETURN",
+    #                                 "bkg_maze_QUIT",
+    #                                 "bkg_maze_MAZE1"    ])
+    convertImage("bkg_falltest", 160, 120, ".png")
 
