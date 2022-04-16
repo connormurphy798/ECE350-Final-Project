@@ -2,29 +2,12 @@
 CHECK_FALL:
     # get current address of sprite
     addi    $s2_x, $r0, 19              # set x to some number
-    nop
-    nop
-    nop
-    nop
     addi    $r4, $r0, 160               # w = 160
-    nop
-    nop
-    nop
-    nop
     mul     $r5, $s2_y, $r4             # y*w
-    nop
-    nop
-    nop
     nop
     add     $r6, $r5, $s2_x             # y*w + x
     nop
-    nop
-    nop
-    nop
     lw      $rtest1, 2560($r6)          # get contents at address y*w + x + 16*160
-    nop
-    nop
-    nop
     nop
     bne     $rtest1, $r0, RENDER        # branch (don't update coordinates) if 1
     
