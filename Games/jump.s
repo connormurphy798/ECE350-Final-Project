@@ -44,7 +44,9 @@ FALLING:
     process_fall:
             addi $r1, $r1, 160                              # $r1 = screenwidth
             addi $r2, $s2_ybuff, 16                         # $r2 = y val of bottom edge of sprite
+            nop
             mul $r3, $r1, $r2                               # $r3 = (y + 16) * screenwidth
+            nop
             addi $r4, $s2_x, 16                             # $r4 = x + 16
 
 
@@ -53,11 +55,15 @@ FALLING:
                 #bottom left
                 add $r5, $s2_x, $r3                         # $r5 = x + (y+16 * screenwidth)
                 add $r5, $r5, $bkg                          # $r5 = offset from background
+                nop
                 lw $r5, 0($r5)
+                nop
                 #bottom right
                 add $r6, $r4, $r3                           # $r6 = x+16 + (y+16 * screenwidth)
                 add $r6, $r6, $bkg                          # $r6 = offset from background
+                nop
                 lw $r6, 0($r6)
+                nop
 
                 bne $r5, $r0, change_to_grounded            # checking bottom corner collision...
                 bne $r6, $r0, change_to_grounded            # |
@@ -102,17 +108,23 @@ GROUNDED:
     process_ground:
             addi $r1, $r1, 160                              # $r1 = screenwidth
             addi $r2, $s2_y, 17                             # $r2 = y val of one below sprite
+            nop
             mul $r3, $r1, $r2                               # $r3 = (y + 16) * screenwidth
+            nop
             addi $r4, $s2_x, 16                             # $r4 = x + 16
 
             #bottom left
             add $r5, $s2_x, $r3                             # $r5 = x + (y+17 * screenwidth)
             add $r5, $r5, $bkg                              # $r5 = offset from background
+            nop
             lw $r5, 0($r5)
+            nop
             #bottom right
             add $r6, $r4, $r3                               # $r6 = x+16 + (y+17 * screenwidth)
             add $r6, $r6, $bkg                              # $r6 = offset from background
+            nop
             lw $r6, 0($r6)
+            nop
 
             bne $r5, $r0, GROUND_DONE                       # if either corner has ground below it, continue grounded
             bne $r6, $r0, GROUND_DONE                       # |

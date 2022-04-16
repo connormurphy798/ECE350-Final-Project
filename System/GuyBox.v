@@ -92,12 +92,12 @@ module GuyBox (
     // testing
     wire [31:0] M_instr;    
 	
-	localparam INSTR_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Games/simple-fall";
-	localparam DATA_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Graphics/MemFiles/bkg_falltest";
+	localparam INSTR_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Games/maze";
+	localparam DATA_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Graphics/MemFiles/bkg_maze_MAZE1";
 	//localparam INSTR_FILE = "./Games/simple-sprite";
 
 	// Main Processing Unit
-	processor CPU(.clock(clk125), .reset(reset | screenEnd | ~curr[3]), 
+	processor CPU(.clock(clk25), .reset(reset | screenEnd | ~curr[3]), 
 								
 		// ROM
 		.address_imem(instAddr), .q_imem(instData),
@@ -116,7 +116,7 @@ module GuyBox (
         
         // Graphics
         .address_gmem(address_gmem), .x_coord(x_coord), .y_coord(y_coord), .sprite(sprite), .gmem_en(gmem_en),
-
+    
 		// Quit Game
 		.quit(quit), .reset_rf(reset_rf)/*,
 
@@ -127,12 +127,12 @@ module GuyBox (
 	
 	// Instruction Memory (ROM)
 	ROM #(.MEMFILE({INSTR_FILE, ".mem"}))
-	InstMem(.clk(clk125), 
+	InstMem(.clk(clk25), 
 		.addr(instAddr[11:0]), 
 		.dataOut(instData));
 	
 	// Register File
-	regfile RegisterFile(.clock(clk125), 
+	regfile RegisterFile(.clock(clk25), 
 		.ctrl_writeEnable(rwe), .ctrl_reset(reset | RESET_RF), 
 		.ctrl_writeReg(rd),
 		.ctrl_readRegA(rs1), .ctrl_readRegB(rs2), .ctrl_readRegC(rs3),
@@ -145,7 +145,7 @@ module GuyBox (
 		.DATA_WIDTH(1),      
 		.ADDRESS_WIDTH(15),     
 		.MEMFILE({DATA_FILE, ".mem"})) 
-	ProcMem(.clk(clk125), 
+	ProcMem(.clk(clk25), 
 		.wEn(mwe), 
 		.addr(memAddr[14:0]), 
 		.dataIn(memDataIn[0]), 

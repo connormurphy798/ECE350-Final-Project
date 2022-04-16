@@ -4,6 +4,7 @@ CHECK_FALL:
     addi    $s2_x, $r0, 19              # set x to some number
     addi    $r4, $r0, 160               # w = 160
     mul     $r5, $s2_y, $r4             # y*w
+    nop
     add     $r6, $r5, $s2_x             # y*w + x
     lw      $rtest1, 2560($r6)          # get contents at address y*w + x + 16*160
     nop
