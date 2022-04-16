@@ -53,6 +53,9 @@ OPENING:
     OPEN_DONE:
         addi $bkg, $r0, 0                       # render opening background
         ren bkg, $r0, $r0, $bkg                 # |
+        addi $s1_x, $r0, 164                    # render sprite offscreen
+        addi $s1_y, $r0, 7                      # | 
+        ren sp1, $s1_x, $s1_y, $r0              # |
         j EXIT
 
 ##################################################################################################################

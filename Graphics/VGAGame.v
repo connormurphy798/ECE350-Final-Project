@@ -117,7 +117,7 @@ module VGAGame(
 		.wEn(1'b0));			
 
 
-    /*
+    
     // sprite 2 GMEM
 	wire[7:0] imgAddress_sp2;  	
 	assign imgAddress_sp2 = (x_adj - sp2_x) + 16*(y_adj - sp2_y) + sp2_addr[7:0];
@@ -131,34 +131,41 @@ module VGAGame(
 		.clk(clk), 						 
 		.addr(imgAddress_sp2),
 		.dataOut(colorAddr_sp2),	
-		.wEn(1'b0));	*/		
+		.wEn(1'b0));			
 	
 	// draw sprites
 	wire [7:0] sp1_l = sp1_x;		wire [6:0] sp1_t = sp1_y;
 	wire [7:0] sp1_r = sp1_x + 8;	wire [6:0] sp1_b = sp1_y + 8;
 	reg in_sp1;	
-    /*
+    
 	wire [7:0] sp2_l = sp2_x;		wire [6:0] sp2_t = sp2_y;
 	wire [7:0] sp2_r = sp2_x + 16;	wire [6:0] sp2_b = sp2_y + 16;
 	reg in_sp2;
-    */
+    
 
 	always @(posedge clk25) begin
         in_sp1	<=	x_adj >= sp1_l &
 					x_adj <  sp1_r &
 					y_adj >= sp1_t &
 					y_adj <  sp1_b;
-		/*in_sp2	<=	x_adj >= sp2_l &
+		in_sp2	<=	x_adj >= sp2_l &
 					x_adj <  sp2_r &
 					y_adj >= sp2_t &
-					y_adj <  sp2_b;*/
+					y_adj <  sp2_b;
 	end
 
 	
 	// color data
-    assign spriteData = colorAddr_sp1/* & sp1_en | colorAddr_sp2 & sp2_en*/;
+    wire [1:0] color_sel;
+    assign color_sel[0] = in_sp1 & sp1_en;
+    assign color_sel[1] = in_sp2 & sp2_en;
+    assign spriteData = colorAddr_sp1 | colorAddr_sp2;
+    mux4_1 colormux(colorData, color_sel,   colorAddr_bkg,
+                                            colorAddr_sp1,
+                                            colorAddr_sp2,
+                                            1'b0);
 
-	assign colorData = in_sp1 & sp1_en /*| in_sp2 & sp2_en */? spriteData : colorAddr_bkg;
+	//assign colorData = in_sp1 & sp1_en | in_sp2 & sp2_en ? spriteData : colorAddr_bkg;
     
 
 
