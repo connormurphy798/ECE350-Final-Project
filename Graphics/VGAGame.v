@@ -75,7 +75,7 @@ module VGAGame(
 	// Image Data to Map Pixel Location to Color Address
 	localparam 
 		PIXEL_COUNT = (VIDEO_WIDTH >> 2)*(VIDEO_HEIGHT >> 2),    // Number of pixels on the screen
-        NUM_PICS = 4,
+        NUM_PICS = 5,
 		PIXEL_ADDRESS_WIDTH = $clog2(PIXEL_COUNT) + NUM_PICS,    // Use built in log2 command
 		BITS_PER_COLOR = 12, 	  								 // Nexys A7 uses 12 bits/color
 		PALETTE_COLOR_COUNT = 2, 								 // Number of Colors available

@@ -17,10 +17,12 @@
 
 addi $r1, $r0, 1                                    # for state 1 comparison
 addi $r2, $r0, 2                                    # for state 2 comparison
+addi $r3, $r0, 3                                    # for state 3 comparison
 
 beq $state, $r0, OPENING                            #  OPENING = state 0
 beq $state, $r1, GAMEPLAY                           # GAMEPLAY = state 1
 beq $state, $r2, MENU                               #     MENU = state 2
+beq $state, $r3, WIN                                #      WIN = state 3
 
 
 
@@ -133,6 +135,17 @@ GAMEPLAY:
             
             addi $s1_x, $s1_xbuff, 0            # replace x coord with xbuff
             addi $s1_y, $s1_ybuff, 0            # replace y coord with ybuff
+
+    check_x:
+            # check if x > 141
+            addi $r10, $r0, 141
+            addi $r11, $r0, 14
+            blt $r10, s1_x, check_y
+            j GAMEPLAY_DONE
+    
+    check_y:
+            # check if y < 14
+            blt $s1_y, $r11, change_to_win
             j GAMEPLAY_DONE
 
 
@@ -149,6 +162,23 @@ GAMEPLAY:
             addi $s1_y, $r0, 0                  # |
 
             addi $bkg, $r0, 19200               # render resume selected on menu change
+
+            j EXIT
+    
+
+    change_to_win:
+            addi $state_buff, $r0, 0            # reset state buffer
+            addi $state, $r0, 3                 # change to WIN state
+
+            ren bkg, $r0, $r0, $bkg             # render background
+            ren sp1, $s1_x, $s1_y, $sp1         # render sprite 1 from memory 0
+
+            addi $s1_xbuff, $s1_x, 0            # save x coordinate
+            addi $s1_ybuff, $s1_y, 0            # save y coordinate
+            addi $s1_x, $r0, 200                # put sprite off screen
+            addi $s1_y, $r0, 0                  # |
+
+            addi $bkg, $r0, 76800               # render resume selected on menu change
 
             j EXIT
 
@@ -229,6 +259,28 @@ MENU:
             ren bkg, $r0, $r0, $bkg             # render background
             ren sp1, $s1_x, $s1_y, $sp1         # render sprite 1 from memory 0
             j EXIT
+
+
+##################################################################################################################
+
+WIN:
+    # check for A (go back to home)
+    bbp 4, win_change_to_start
+    j WIN_DONE
+
+    win_change_to_start:
+        addi $state, $r0, 0                 # change to OPENING state
+
+    # render win background and sprite offscreen
+    WIN_DONE:
+        addi $bkg, $r0, 76800
+        addi $s1_x, $r0, 164
+        addi $s1_y, $r0, 7
+        addi $sp1, $r0, 0
+
+        ren bkg, $r0, $r0, $bkg
+        ren sp1, $s1_x, $s1_y, $sp1
+        j EXIT
 
 
 ##################################################################################################################
