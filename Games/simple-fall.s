@@ -44,7 +44,7 @@ FALLING:
             add     $r6, $r5, $s2_x             # y*w + x
             lw      $rtest1, 2560($r6)          # get contents at address y*w + x + 16*160
             nop
-            lw      $rtest2, 2576($r60          # get contents at address y*w + x+16 + 16*160
+            lw      $rtest2, 2576($r6)          # get contents at address y*w + x+16 + 16*160
             nop
             bne     $rtest1, $r0, change_to_grounded        # branch (don't update coordinates) if 1
             bne     $rtest2, $r0, change_to_grounded        
@@ -90,7 +90,7 @@ GROUNDED:
             add     $r6, $r5, $s2_x             # y*w + x
             lw      $rtest1, 2560($r6)          # get contents at address y*w + x + 16*160
             nop
-            lw      $rtest2, 2576($r60          # get contents at address y*w + x+16 + 16*160
+            lw      $rtest2, 2576($r6)          # get contents at address y*w + x+16 + 16*160
             nop
             bne     $rtest1, $r0, RENDER_GROUND        # stay grouned if 1
             bne     $rtest2, $r0, RENDER_GROUND
