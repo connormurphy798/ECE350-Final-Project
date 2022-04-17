@@ -1,4 +1,6 @@
-module X_control(ALUinB, imm32, ALUop, shamt, ctrl_MULT, ctrl_DIV, jb, target_actual, jal, setx, ren, sprite, quit_status, instr, PC, ALU_B, ne, lt, rstatus, bypexcpt, controller);
+module X_control(   ALUinB, imm32, ALUop, shamt, ctrl_MULT, ctrl_DIV,
+                    jb, target_actual, jal, setx, ren, sprite, quit_status,
+                    instr, PC, ALU_B, ne, lt, rstatus, bypexcpt, controller);
     input [31:0] instr, PC, ALU_B;
     input ne, lt;
     input [31:0] rstatus;

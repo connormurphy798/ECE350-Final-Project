@@ -53,11 +53,11 @@ FALLING:
             addi    $s2_y, $s2_y, 1             # y++
 
             addi $r10, $r10, -1                 # decrement counter
-            bne $r10, $r0, CHECK_FALL           # loop until counter is 0
+            #bne $r10, $r0, CHECK_FALL           # loop until counter is 0
             j RENDER_FALL
 
     change_to_grounded:
-            addi $state, $r0, 3                             # change to grounded state
+            #addi $state, $r0, 3                             # change to grounded state
             j RENDER_FALL
 
     RENDER_FALL:

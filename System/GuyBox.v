@@ -26,12 +26,19 @@ module GuyBox (
 	output[3:0] VGA_R,
 	output[3:0] VGA_G,
 	output[3:0] VGA_B,
-	
+    /*
+    // Audio   
+    output audio_play,
+    output audio_data,
+    output audio_on,    // test
+    
+	*/
     // state info
     output[7:0] buttons,
-    output[3:0] curr/*,
+    output[3:0] curr
     
     // testing
+    /*
     output rtest1,
     output rtest2,
     output RAM_val   // 
@@ -51,7 +58,7 @@ module GuyBox (
     assign clk03125 = pixCounter[4];
     assign clk015625 = pixCounter[5];
 	always @(posedge clk) begin
-		pixCounter <= pixCounter + 1; // Since the reg is only 3 bits, it will reset every 8 cycles
+		pixCounter <= pixCounter + 1; // Since the reg is only 6 bits, it will reset every 64 cycles
 	end
 
 
@@ -87,17 +94,28 @@ module GuyBox (
 					.gmem_en(gmem_en), .addr_gmem_IN(address_gmem),
 					.x_coord_IN(x_coord[7:0]), .y_coord_IN(y_coord[6:0]),
 					.imgcode_IN(sprite[1:0]));
-		
+
+    /*
+    // Audio
+    wire [4:0] audio_freq;
+    wire [16:0] audio_dur;
+    wire audio_start;
+    assign audio_on = audio_play;
+    AudioController audio(  .clk25(clk25), .frclk(screenEnd),
+                            .freq(audio_freq), .dur(audio_dur), .start(audio_start),
+                            .reset(reset | QUIT),
+                            .audioEn(audio_play), .audioOut(audio_data));
+	*/
 		
     // testing
     wire [31:0] M_instr;    
 	
-	localparam INSTR_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Games/maze";
-	localparam DATA_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Graphics/MemFiles/bkg_maze_MAZE1";
+	localparam INSTR_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Games/simple-fall";
+	localparam DATA_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Graphics/MemFiles/bkg_falltest";
 	//localparam INSTR_FILE = "./Games/simple-sprite";
 
 	// Main Processing Unit
-	processor CPU(.clock(clk25), .reset(reset | screenEnd | ~curr[3]), 
+	processor CPU(.clock(clk125), .reset(reset | screenEnd | ~curr[3]), 
 								
 		// ROM
 		.address_imem(instAddr), .q_imem(instData),
@@ -116,6 +134,10 @@ module GuyBox (
         
         // Graphics
         .address_gmem(address_gmem), .x_coord(x_coord), .y_coord(y_coord), .sprite(sprite), .gmem_en(gmem_en),
+
+        // Audio
+        /*
+        .audio_freq(audio_freq), .audio_dur(audio_dur), .audio_en(audio_start),*/
     
 		// Quit Game
 		.quit(quit), .reset_rf(reset_rf)/*,
@@ -127,12 +149,12 @@ module GuyBox (
 	
 	// Instruction Memory (ROM)
 	ROM #(.MEMFILE({INSTR_FILE, ".mem"}))
-	InstMem(.clk(clk25), 
+	InstMem(.clk(clk125), 
 		.addr(instAddr[11:0]), 
 		.dataOut(instData));
 	
 	// Register File
-	regfile RegisterFile(.clock(clk25), 
+	regfile RegisterFile(.clock(clk125), 
 		.ctrl_writeEnable(rwe), .ctrl_reset(reset | RESET_RF), 
 		.ctrl_writeReg(rd),
 		.ctrl_readRegA(rs1), .ctrl_readRegB(rs2), .ctrl_readRegC(rs3),
@@ -145,7 +167,7 @@ module GuyBox (
 		.DATA_WIDTH(1),      
 		.ADDRESS_WIDTH(15),     
 		.MEMFILE({DATA_FILE, ".mem"})) 
-	ProcMem(.clk(clk25), 
+	ProcMem(.clk(clk125), 
 		.wEn(mwe), 
 		.addr(memAddr[14:0]), 
 		.dataIn(memDataIn[0]), 

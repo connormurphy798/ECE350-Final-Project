@@ -1,3 +1,5 @@
+./Audio/AudioController.v
+./Audio/PWMSerializer.v
 ./Card/CardController.v
 ./Controller/ControllerController.v
 ./Controller/ControllerController_tb.v
@@ -88,6 +90,7 @@
 ./System/ColorsFSM.v
 ./System/GuyBox.v
 ./System/HomescreenFSM.v
+./System/ProcAudioInterface.v
 ./System/ProcVGAInterface.v
 ./System/TestFiles/GuyBox_tb.v
 ./System/TestFiles/UserInterfaceFSM_tb.v

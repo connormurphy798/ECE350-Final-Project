@@ -38,14 +38,15 @@ module processor(
     y_coord,                        // O: The y [0,120) coordinate at which to display the image
     sprite,                         // O: Sprite code [0,2] for the image to be displayed
     gmem_en,                        // O: Flag that is asserted when graphics output is valid
-
+    
+    // Audio
+    audio_freq,                     // O: Frequency code [0,24] of audio to be played
+    audio_dur,                      // O: Duration of audio to be played
+    audio_en,                       // O: Flag that is asserted when audio output is valid
+    
     // Game State
     quit,                           // O: Signal to quit to welcome screen
-    reset_rf/*,                        // O: Signal to reset regfile on quit
-
-    // testing
-    M_instruction*/
-	 
+    reset_rf                        // O: Signal to reset regfile on quit
 	);
 
 	// Control signals
@@ -75,6 +76,11 @@ module processor(
     output [31:0] y_coord;
     output [11:0] sprite;
     output gmem_en;
+
+    // Audio
+    output [4:0] audio_freq;
+    output [16:0] audio_dur; 
+    output audio_en; 
 
     // Game State
     output quit;
@@ -236,7 +242,8 @@ module processor(
     // --------------------------------------------------------------------------------------------------------------------------
 
     // control
-    X_control x_ctrl(ALUinB_X, imm32_X, ALUop_X, shamt_X, ctrl_MULT_X, ctrl_DIV_X, jb_X, PC_alt, jal_X, setx_X, ren_X, sprite_X, quitgame_X,
+    X_control x_ctrl(   ALUinB_X, imm32_X, ALUop_X, shamt_X, ctrl_MULT_X, ctrl_DIV_X,
+                        jb_X, PC_alt, jal_X, setx_X, ren_X, sprite_X, quitgame_X,
                         INSTR_DX, PC_DX, ALU_input_B_pre, neq_X, lt_X, ALU_input_B_pre, (excpt_XM | excpt_MW | excpt_CW | md_excpt), controller);
 
     // bypassing 
@@ -270,6 +277,11 @@ module processor(
     assign x_coord      = ALU_input_A;
     assign y_coord      = ALU_input_B_pre;
     assign address_gmem = Val_C;
+
+    // send info off to audio
+    assign audio_freq   = INSTR_DX[21:17];
+    assign audio_dur    = INSTR_DX[16:0]; 
+    assign audio_en     = INSTR_DX[31] & INSTR_DX[30] & ~INSTR_DX[29] & INSTR_DX[28] & INSTR_DX[27]; // 11011 play
 
     // quit game
     assign quit     = quitgame_X[0];

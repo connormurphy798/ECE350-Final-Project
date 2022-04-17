@@ -14,6 +14,8 @@ module GuyBox_tb();
     wire hSync, vSync;
     wire [3:0] VGA_R, VGA_G, VGA_B;
 
+    wire audio_play, audio_data, audio_start;
+
     
     always
 		#10 clk = ~clk; 
@@ -23,6 +25,7 @@ module GuyBox_tb();
                 .pin5(pin5), .pin6(sel), .pin8(pin8),
                 .hSync(hSync), .vSync(vSync),
                 .VGA_R(VGA_R), .VGA_G(VGA_G), .VGA_B(VGA_B),
+                /*.audio_play(audio_play), .audio_data(audio_data), .audio_start(audio_start),*/
                 .buttons(buttons), .curr(curr)
                 );
 
