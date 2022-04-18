@@ -69,6 +69,11 @@ FALLING:
             j RENDER_FALL
 
     GROUNDED:
+            beq $r14, $r0, no_lockout
+            addi $r14, $r14, -1                 # decrement jump lockout
+            j RENDER_FALL
+
+            no_lockout:
             bbp 5, JUMP                         # jump on B press
             j RENDER_FALL
 
@@ -112,12 +117,13 @@ JUMPING:
 
     END_JUMP:
             addi $state, $r0, 1
+            addi $r14, $r0, 5                   # can't jump again for 5 grounded cycles
             j RENDER_JUMP
 
     RENDER_JUMP:
             addi $r3, $r0, 3
             addi $r4, $r0, 480
-            addi $r11, $r0, 30                  # screen breakpoint
+            addi $r11, $r0, 45                  # screen breakpoint
             nop
             nop
             blt $r10, $r3, float                # on last 2 frames, float in air
