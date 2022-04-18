@@ -43,7 +43,8 @@ FALLING:
             j CHECK_FALL
 
     CHECK_FALL:
-            addi $r11, $r0, 119                 # death point
+            addi $r11, $r0, 103                 # death point
+            nop
             blt $r11, $s2_y, DEATH 
 
             addi    $r4, $r0, 160               # w = 160
@@ -62,7 +63,7 @@ FALLING:
             addi    $s2_y, $s2_y, 1             # y++
 
             addi $r10, $r10, -1                 # decrement counter
-            #bne $r10, $r0, CHECK_FALL           # loop until counter is 0
+            bne $r10, $r0, CHECK_FALL           # loop until counter is 0
             j RENDER_FALL
 
     GROUNDED:
@@ -71,7 +72,7 @@ FALLING:
 
     JUMP:
             addi $state, $r0, 3                 # enter jumping state
-            addi $r10, $r0, 45                  # jump for 45 frames
+            addi $r10, $r0, 25                  # jump for 25 frames
             j RENDER_FALL
 
     DEATH:
@@ -112,8 +113,18 @@ JUMPING:
             j RENDER_JUMP
 
     RENDER_JUMP:
+            addi $r11, $r0, 80                  # screen midpoint
+            blt $r11, $s2_y, change_y
+            nop
             addi $r10, $r10, -1                 # decrement counter
-            addi $bkg, $bkg, -320               # move background up by two pixels
+            addi $bkg, $bkg, -480               # move background up by three pixels
+            j done
+
+            change_y:
+                addi $s2_y, $s2_y, -3
+                j done
+
+            done:
             ren     sp2, $s2_x, $s2_y, $r0      # render sp2
             ren     bkg, $r0, $r0, $bkg         # render bkg
             j EXIT
