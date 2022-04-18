@@ -1,167 +1,108 @@
 #
-# doodle-jump-like vertical platformer
-3
-# pipeline and PC latches reset on frame change
-# state register holds main menu, gameplay, or game menu
-#       each has a separate loop
-#       at end of each loop go to exit
-#           does nop until next frame resets it
+# simple jump test
 #
+# $state = 1 = FALLING = affected by gravity, cannot jump
+# $state = 3 = JUMPING = gravity off, moving upwards for some frames, cannot jump
 #
-# BACKGROUND MEMORY LOCATIONS
-# 0 = opening screen
-# 19200 = pause, resume selected
-# 38400 = pause, exit selected
-# 57600 = start of background
 ##################################################################################################################
 
-addi $r1, $r0, 1                                    # for state 1 comparison
-addi $r2, $r0, 2                                    # for state 2 comparison
+addi $r1, $r0, 1
+addi $r3, $r0, 3
 
-beq $state, $r0, OPENING                            #  OPENING = state 0
-beq $state, $r1, GAMEPLAY                           # GAMEPLAY = state 1
-beq $state, $r2, MENU                               #     MENU = state 2
+beq $state, $r0, OPENING                                   
+beq $state, $r1, FALLING
+beq $state, $r3, JUMPING
 
 
-
-#OPENING SCREEN FOR GAME
 OPENING:
-    bbp 7, start_OPEN
-    bne $state_buff, $r0, change_to_game
-    j OPEN_DONE
-
-    start_OPEN:                                 # on START press
-        addi $state_buff, $r0, 1                # put 1 into state buffer
-        j OPEN_DONE
-
-    change_to_game:
-        addi $state_buff, $r0, 0                # reset state buffer
-        addi $state, $r0, 1                     # change to GAMEPLAY state
-
-        addi $bkg, $r0, 0                       # render opening background
-        ren bkg, $r0, $r0, $bkg                 # |
-
-        addi $bkg, $r0, 57600                   # render game background next
-        addi $sp1, $r0, 0                       # render sprite at memory 0 next
-
-        ######## INITIALIZE SPRITE POSITION ########
-
-        j EXIT
-
-    OPEN_DONE:
-        addi $bkg, $r0, 0                       # render opening background
-        ren bkg, $r0, $r0, $bkg                 # |
-        j EXIT
+    addi $state, $r0, 1
+    addi $bkg, $r0, 38400
+    addi $s2_x, $r0, 16
+    addi $s2_y, $r0, 16
+    j EXIT
 
 ##################################################################################################################
 
+FALLING:
+    bbp 2, left_FALL
+    bbp 3, right_FALL
+    addi $r10, $r0, 3                           # free fall by 3 pixels at a time
+    j CHECK_FALL
 
-#DIRECTIONAL BUTTONS CONTROL SPRITE MOVEMENT
-GAMEPLAY:
-    addi $s1_xbuff, $s1_x, 0                    # initialize xbuff to x
-    addi $s1_ybuff, $s1_y, 0                    # initialize ybuff to y
+    left_FALL:
+            addi $s2_x, $s2_x, -2
+            #addi $sp2, SET LEFT FACING SPRITE
+            j CHECK_FALL
 
-    
+    right_FALL:
+            addi $s2_x, $s2_x, 2
+            #addi $sp2, SET RIGHT FACING SPRITE
+            j CHECK_FALL
 
+    CHECK_FALL:
+            addi    $r4, $r0, 160               # w = 160
+            mul     $r5, $s2_y, $r4             # y*w
+            nop
+            add     $r6, $r5, $s2_x             # y*w + x
+            add     $r6, $r6, $bkg
+            lw      $rtest1, 2560($r6)          # get contents at address y*w + x + 16*160
+            nop
+            lw      $rtest2, 2576($r6)          # get contents at address y*w + x+16 + 16*160
+            nop
+            bne     $rtest1, $r0, GROUNDED      # branch (don't update coordinates) if 1
+            bne     $rtest2, $r0, GROUNDED       
+            
+            # update sprite coordinates
+            addi    $s2_y, $s2_y, 1             # y++
 
-    change_to_menu:
-            addi $state_buff, $r0, 0            # reset state buffer
-            addi $state, $r0, 2                 # change to MENU state
+            addi $r10, $r10, -1                 # decrement counter
+            #bne $r10, $r0, CHECK_FALL           # loop until counter is 0
+            j RENDER_FALL
 
-            ren bkg, $r0, $r0, $bkg             # render background
-            ren sp1, $s1_x, $s1_y, $sp1         # render sprite 1 from memory 0
+    GROUNDED:
+            bbp 5, JUMP                         # jump on B press
+            j RENDER_FALL
 
-            addi $s1_xbuff, $s1_x, 0            # save x coordinate
-            addi $s1_ybuff, $s1_y, 0            # save y coordinate
-            addi $s1_x, $r0, 200                # put sprite off screen
-            addi $s1_y, $r0, 0                  # |
+    JUMP:
+            addi $state, $r0, 3                 # enter jumping state
+            addi $r10, $r0, 30                  # jump for 30 frames
+            j RENDER_FALL
 
-            addi $bkg, $r0, 19200               # render resume selected on menu change
-
+    RENDER_FALL:
+            ren     sp2, $s2_x, $s2_y, $r0      # render sp2
+            ren     bkg, $r0, $r0, $bkg         # render bkg
             j EXIT
-
-
-    GAMEPLAY_DONE:
-            ren bkg, $r0, $r0, $bkg             # render background
-            ren sp1, $s1_x, $s1_y, $sp1         # render sprite 1 from memory 0
-            j EXIT
-
-
 
 ##################################################################################################################
 
+JUMPING:
+    beq $r10, $r1, END_JUMP                     # on last frame, change state
+    bbp 2, left_JUMP
+    bbp 3, right_JUMP
+    j RENDER_JUMP
 
-#DIRECTIONAL BUTTONS DON'T CONTROL SPRITE MOVEMENT
-MENU:
-    addi $r1, $r0, 1                            # for state_buff comparison
-    addi $r2, $r0, 2                            # |
+    left_JUMP:
+            addi $s2_x, $s2_x, -2
+            #addi $sp2, SET LEFT FACING SPRITE
+            j RENDER_JUMP
 
-    bbp 7, start_MENU
-    bbp 4, a_MENU
-    beq $state_buff, $r1, menu_change_to_game
-    beq $state_buff, $r2, exit_game
-    bbp 2, left_MENU
-    bbp 3, right_MENU
-    
-    j MENU_DONE
+    right_JUMP:
+            addi $s2_x, $s2_x, 2
+            #addi $sp2, SET RIGHT FACING SPRITE
+            j RENDER_JUMP
 
-    start_MENU:                                 # on START press
-            addi $state_buff, $r0, 1            # put 1 into state buffer
-            j MENU_DONE
+    END_JUMP:
+            addi $state, $r0, 1
+            j RENDER_JUMP
 
-    a_MENU:                                     # on A press
-            addi $r1, $r0, 38400
-            beq $bkg, $r1, do_quit
-            addi $state_buff, $r0, 1            # put 1 into state buffer
-            j MENU_DONE
-
-            do_quit:
-                addi $state_buff, $r0, 2        # put 2 into state buffer
-                j MENU_DONE
-
-    left_MENU:                                  # on LEFT press
-            addi $bkg, $r0, 19200
-            j MENU_DONE
-
-    right_MENU:                                 # on RIGHT press
-            addi $bkg, $r0, 38400
-            j MENU_DONE
-
-    menu_change_to_game:
-            addi $state_buff, $r0, 0            # reset state buffer
-            addi $state, $r0, 1                 # change to GAMEPLAY state
-            addi $s1_x, $s1_xbuff, 0            # move sprite back on screen
-            addi $s1_y, $s1_ybuff, 0            # |
-
-            ren bkg, $r0, $r0, $bkg             # render menu background
-
-            addi $bkg, $r0, 57600               # render game background next
+    RENDER_JUMP:
+            addi $r10, $r10, -1                 # decrement counter
+            addi $bkg, $bkg, -160               # move background up by one pixel
+            ren     sp2, $s2_x, $s2_y, $r0      # render sp2
+            ren     bkg, $r0, $r0, $bkg         # render bkg
             j EXIT
-
-    exit_game:
-            addi $state_buff, $r0, 0            # reset state buffer
-            addi $state, $r0, 1                 # go to game when returning from quit
-            addi $s1_x, $s1_xbuff, 0            # move sprite back on screen
-            addi $s1_y, $s1_ybuff, 0            # |
-            addi $bkg, $r0, 57600               # render game background next
-            nop
-            nop                                 # stall to let state change get through pipeline
-            nop
-            nop
-            nop
-            QUITGAME $r0                        # quits game and keeps progress saved
-            j EXIT
-
-
-    MENU_DONE:
-            ren bkg, $r0, $r0, $bkg             # render background
-            ren sp1, $s1_x, $s1_y, $sp1         # render sprite 1 from memory 0
-            j EXIT
-
-
-##################################################################################################################
 
 EXIT:
     nop
     nop
-    j EXIT                                      # loop until frame reset
+    j EXIT
