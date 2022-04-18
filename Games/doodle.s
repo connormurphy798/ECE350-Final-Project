@@ -33,14 +33,30 @@ FALLING:
     j CHECK_FALL
 
     left_FALL:
+            addi $r2, $r0, 2
+            nop
+            blt $s2_x, $r2, appear_right_fall
             addi $s2_x, $s2_x, -2
             addi $sp2, $r0, 0
             j CHECK_FALL
 
+            appear_right_fall:
+                addi $s2_x, $r0, 159
+                addi $sp2, $r0, 0
+                j CHECK_FALL
+
     right_FALL:
+            addi $r3, $r0, 158
+            nop
+            blt $r3, $s2_x, appear_left_fall
             addi $s2_x, $s2_x, 2
             addi $sp2, $r0, 256
             j CHECK_FALL
+
+            appear_left_fall:
+                addi $s2_x, $r0, 0
+                addi $sp2, $r0, 256
+                j CHECK_FALL
 
     CHECK_FALL:
             addi $r11, $r0, 103                 # death point
@@ -79,7 +95,7 @@ FALLING:
 
     JUMP:
             addi $state, $r0, 3                 # enter jumping state
-            addi $r10, $r0, 7                  # jump for 7 frames
+            addi $r10, $r0, 15                  # jump for 15 frames
             j RENDER_FALL
 
     DEATH:
@@ -126,7 +142,6 @@ JUMPING:
             addi $r11, $r0, 45                  # screen breakpoint
             nop
             nop
-            blt $r10, $r3, float                # on last 2 frames, float in air
             blt $r11, $s2_y, change_y           # until breakpoint, change y instead of background
             nop
             blt $bkg, $r4, hold_bkg             # make sure bkg doesn't go lower than 0
@@ -135,17 +150,14 @@ JUMPING:
             j done
 
             hold_bkg:
-                addi $r10, $r0, 2               # start float
                 addi $bkg, $r0, 0
                 j done
 
             change_y:
                 addi $s2_y, $s2_y, -3
+                addi $r10, $r10, -1             # decrement counter
                 j done
             
-            float:
-                addi $r10, $r10, -1
-                j done
 
             done:
             ren     sp2, $s2_x, $s2_y, $sp2     # render sp2
