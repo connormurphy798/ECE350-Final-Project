@@ -110,7 +110,7 @@ module GuyBox (
     // testing
     wire [31:0] M_instr;    
 	
-	localparam INSTR_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Games/simple-fall";
+	localparam INSTR_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Games/doodle";
 	localparam DATA_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Graphics/MemFiles/bkg_jump_gmem";
 	//localparam INSTR_FILE = "./Games/simple-sprite";
 
