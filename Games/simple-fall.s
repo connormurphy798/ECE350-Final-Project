@@ -9,7 +9,7 @@
 addi $r1, $r0, 1
 addi $r3, $r0, 3
 
-beq $state, $r0, OPENING                                    # by default go to falling state for this test
+beq $state, $r0, OPENING                                   
 beq $state, $r1, FALLING
 beq $state, $r3, JUMPING
 
@@ -35,8 +35,8 @@ OPENING:
         addi $sp2, $r0, 0                       # render sprite at memory 0 next
 
         ######## INITIALIZE SPRITE POSITION ########
-        addi $s1_x, $r0, 16
-        addi $s1_y, $r0, 16
+        addi $s2_x, $r0, 16
+        addi $s2_y, $r0, 16
 
         j EXIT
 
@@ -67,12 +67,11 @@ FALLING:
             j CHECK_FALL
 
     CHECK_FALL:
-            # get current address of sprite
-            #addi    $s2_x, $r0, 19              # set x to some number
             addi    $r4, $r0, 160               # w = 160
             mul     $r5, $s2_y, $r4             # y*w
             nop
             add     $r6, $r5, $s2_x             # y*w + x
+            add     $r6, $r6, $bkg
             lw      $rtest1, 2560($r6)          # get contents at address y*w + x + 16*160
             nop
             lw      $rtest2, 2576($r6)          # get contents at address y*w + x+16 + 16*160
