@@ -111,7 +111,7 @@ module GuyBox (
     wire [31:0] M_instr;    
 	
 	localparam INSTR_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Games/doodle";
-	localparam DATA_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Graphics/MemFiles/bkg_jump_gmem";
+	localparam DATA_FILE = "C:/Users/conno/Documents/Duke/Y3.2/CS350/projects/ECE350-Final-Project/Graphics/MemFiles/bkg_jump_dmem";
 	//localparam INSTR_FILE = "./Games/simple-sprite";
 
 	// Main Processing Unit
@@ -163,13 +163,13 @@ module GuyBox (
 						
 	// Processor Memory (RAM)
 	RAM #(		
-		.DEPTH(57600), 
+		.DEPTH(76800), 
 		.DATA_WIDTH(1),      
-		.ADDRESS_WIDTH(16),     
+		.ADDRESS_WIDTH(17),     
 		.MEMFILE({DATA_FILE, ".mem"})) 
 	ProcMem(.clk(clk0625), 
 		.wEn(mwe), 
-		.addr(memAddr[15:0]), 
+		.addr(memAddr[16:0]), 
 		.dataIn(memDataIn[0]), 
 		.dataOut(memDataOut));
 	

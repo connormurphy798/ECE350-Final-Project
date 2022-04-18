@@ -20,16 +20,16 @@ beq $state, $r4, DEAD
 OPENING:
     addi $state, $r0, 1
     addi $bkg, $r0, 57600
-    addi $s2_x, $r0, 16
-    addi $s2_y, $r0, 16
+    addi $s2_x, $r0, 20
+    addi $s2_y, $r0, 57
     j EXIT
 
 ##################################################################################################################
 
 FALLING:
+    addi $r10, $r0, 3                           # free fall by 3 pixels at a time
     bbp 2, left_FALL
     bbp 3, right_FALL
-    addi $r10, $r0, 3                           # free fall by 3 pixels at a time
     j CHECK_FALL
 
     left_FALL:
@@ -63,6 +63,8 @@ FALLING:
             addi    $s2_y, $s2_y, 1             # y++
 
             addi $r10, $r10, -1                 # decrement counter
+            nop
+            nop
             bne $r10, $r0, CHECK_FALL           # loop until counter is 0
             j RENDER_FALL
 
@@ -72,7 +74,7 @@ FALLING:
 
     JUMP:
             addi $state, $r0, 3                 # enter jumping state
-            addi $r10, $r0, 25                  # jump for 25 frames
+            addi $r10, $r0, 7                  # jump for 7 frames
             j RENDER_FALL
 
     DEATH:
@@ -80,7 +82,7 @@ FALLING:
             j RENDER_FALL
 
     RENDER_FALL:
-            ren     sp2, $s2_x, $s2_y, $r0      # render sp2
+            ren     sp2, $s2_x, $s2_y, $sp2      # render sp2
             ren     bkg, $r0, $r0, $bkg         # render bkg
             j EXIT
 
@@ -113,19 +115,34 @@ JUMPING:
             j RENDER_JUMP
 
     RENDER_JUMP:
-            addi $r11, $r0, 80                  # screen midpoint
-            blt $r11, $s2_y, change_y
+            addi $r3, $r0, 3
+            addi $r4, $r0, 480
+            addi $r11, $r0, 30                  # screen breakpoint
             nop
+            nop
+            blt $r10, $r3, float                # on last 2 frames, float in air
+            blt $r11, $s2_y, change_y           # until breakpoint, change y instead of background
+            nop
+            blt $bkg, $r4, hold_bkg             # make sure bkg doesn't go lower than 0
             addi $r10, $r10, -1                 # decrement counter
-            addi $bkg, $bkg, -480               # move background up by three pixels
+            addi $bkg, $bkg, -480               # move background up by 3 pixels
             j done
+
+            hold_bkg:
+                addi $r10, $r0, 2               # start float
+                addi $bkg, $r0, 0
+                j done
 
             change_y:
                 addi $s2_y, $s2_y, -3
                 j done
+            
+            float:
+                addi $r10, $r10, -1
+                j done
 
             done:
-            ren     sp2, $s2_x, $s2_y, $r0      # render sp2
+            ren     sp2, $s2_x, $s2_y, $sp2     # render sp2
             ren     bkg, $r0, $r0, $bkg         # render bkg
             j EXIT
 
